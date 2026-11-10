@@ -1,0 +1,13 @@
+{
+  "scenario_id": "S1",
+  "case_id": "s64u1-2024-09-10-001",
+  "mode": "replay",
+  "chain_mode": "stub",
+  "bundle_hash": "7c8e9a01b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+  "submit_tx_hash": "sbx_1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b",
+  "post_vote_status": "Bidding",
+  "cap_amount": "5000000000",
+  "final_status": "Delivered",
+  "started_at": "2024-09-10T06:00:00Z",
+  "completed_at": "2024-09-10T06:00:02Z"
+}

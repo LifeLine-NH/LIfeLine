@@ -1,0 +1,7 @@
+{
+  "strongest_objection": "All 30 reports were sent by a single source_id (source_diversity = 1) every 4 seconds using an identical bot template ('URGENT FLOOD ALERT: Severe flooding in sector 4... [msg NN]'), with 0.2mm rain and zero external alerts.",
+  "can_be_rebutted": false,
+  "verdict": "No",
+  "confidence_bps": 9900,
+  "reasoning": "Objection cannot be rebutted: textbook Sybil botnet attack from a single sender with zero meteorological or humanitarian corroboration."
+}

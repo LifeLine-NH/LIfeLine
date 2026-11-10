@@ -1,0 +1,7 @@
+{
+  "strongest_objection": "Field reports could be exaggerating routine seasonal rain into a dam breach emergency.",
+  "can_be_rebutted": true,
+  "verdict": "Yes",
+  "confidence_bps": 8900,
+  "reasoning": "Objection is fully rebutted by 3 independent external sources: Open-Meteo (112.4mm/24h rain), GDACS Red Alert, and UN OCHA ReliefWeb situation report."
+}

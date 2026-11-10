@@ -1,0 +1,7 @@
+{
+  "strongest_objection": "Field reports could be exaggerating routine seasonal rain into a dam breach emergency to trigger higher-tier payouts.",
+  "can_be_rebutted": true,
+  "verdict": "Yes",
+  "confidence_bps": 8900,
+  "reasoning": "Objection is fully rebutted by 3 independent external sources: Open-Meteo confirms an extreme 112.4mm/24h downpour, GDACS issued a Red Flood Alert specifically for Borno State/Maiduguri, and UN OCHA ReliefWeb confirmed the Alau Dam breach."
+}

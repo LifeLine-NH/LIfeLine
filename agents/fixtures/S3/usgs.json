@@ -1,0 +1,12 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "generated": 1738411800000,
+    "title": "USGS Earthquakes",
+    "status": 200,
+    "count": 0
+  },
+  "features": [],
+  "retrieved_at": "2025-02-01T12:10:00Z",
+  "source_url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=9.06&longitude=7.50&maxradiuskm=150&starttime=2025-01-31&endtime=2025-02-02"
+}

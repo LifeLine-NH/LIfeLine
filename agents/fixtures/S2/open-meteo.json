@@ -1,0 +1,21 @@
+{
+  "latitude": 12.0,
+  "longitude": 8.59,
+  "generationtime_ms": 0.41,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "daily_units": {
+    "time": "iso8601",
+    "precipitation_sum": "mm",
+    "rain_sum": "mm",
+    "wind_speed_10m_max": "km/h"
+  },
+  "daily": {
+    "time": ["2025-01-13", "2025-01-14", "2025-01-15"],
+    "precipitation_sum": [0.0, 0.0, 0.0],
+    "rain_sum": [0.0, 0.0, 0.0],
+    "wind_speed_10m_max": [11.2, 10.5, 12.1]
+  },
+  "retrieved_at": "2025-01-15T10:20:00Z",
+  "source_url": "https://archive-api.open-meteo.com/v1/archive?latitude=12.00&longitude=8.59&start_date=2025-01-13&end_date=2025-01-15&daily=precipitation_sum,rain_sum,wind_speed_10m_max"
+}

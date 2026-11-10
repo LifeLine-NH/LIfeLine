@@ -1,0 +1,24 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "eventtype": "FL",
+        "eventid": 1102834,
+        "name": "Flood in Nigeria (Borno State / Maiduguri)",
+        "alertlevel": "Red",
+        "severity": "Extreme flood impact following Alau Dam breach; estimated >200,000 displaced in Maiduguri",
+        "country": "Nigeria",
+        "fromdate": "2024-09-09T00:00:00Z",
+        "todate": "2024-09-12T00:00:00Z"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [13.151, 11.831]
+      }
+    }
+  ],
+  "retrieved_at": "2024-09-10T06:00:00Z",
+  "source_url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria"
+}

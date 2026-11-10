@@ -121,7 +121,7 @@ export const VoteRecordSchema = z.object({
   model: z.string().min(1),
   verdict: VerdictSchema,
   confidence_bps: z.number().int().min(0).max(10000),
-  tier: z.number().int().min(1).max(4).default(0),
+  tier: z.number().int().min(0).max(4).default(0),
   reasoning: z.string().min(1),
   strongest_objection: z.string().optional(),
   can_be_rebutted: z.boolean().optional(),

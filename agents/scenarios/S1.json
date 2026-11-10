@@ -1,0 +1,52 @@
+{
+  "id": "S1",
+  "name": "Maiduguri Alau Dam Flood (Genuine Replay)",
+  "description": "Replay of the real September 10, 2024 Maiduguri flood in Borno State, NE Nigeria following the Alau Dam spillway failure. Multi-source field reports corroborated by historical precipitation anomaly, GDACS flood alert, and ReliefWeb situation reports.",
+  "incident_type": "flood",
+  "requested_tier": 3,
+  "expected_verification_status": "Bidding",
+  "expected_final_status": "Delivered",
+  "tamper_proof_mode": "valid",
+  "reports": [
+    {
+      "source_type": "sms_relay",
+      "source_id": "ng-borno-sms-0104",
+      "text": "Water from Alau Dam has breached river banks into Gwange and Maiduguri central. Streets under 1.5m of water, families trapped on roofs.",
+      "lat": 11.8312,
+      "lon": 13.1514,
+      "ts": "2024-09-10T04:15:00Z"
+    },
+    {
+      "source_type": "partner_relay",
+      "source_id": "nema-borno-field-02",
+      "text": "Urgent: Custom Bridge and Lagos Street in Maiduguri overtopped by rapid flash floodwaters following Alau Dam overflow. Evacuation boats needed.",
+      "lat": 11.8330,
+      "lon": 13.1528,
+      "ts": "2024-09-10T04:28:00Z"
+    },
+    {
+      "source_type": "web_form",
+      "source_id": "unimaid-clinic-volunteer-7",
+      "text": "Heavy flooding across Maiduguri metropolitan area since 4am. Over 500 displaced households gathering at high ground near post office.",
+      "lat": 11.8295,
+      "lon": 13.1492,
+      "ts": "2024-09-10T04:42:00Z"
+    },
+    {
+      "source_type": "partner_relay",
+      "source_id": "redcross-ng-borno-09",
+      "text": "Confirmed dam breach impact in Maiduguri. Clean water sources contaminated, immediate shelter and WASH kits required for displaced families.",
+      "lat": 11.8321,
+      "lon": 13.1505,
+      "ts": "2024-09-10T04:55:00Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id": "ng-borno-sms-0882",
+      "text": "Shehu's Palace area and Monday Market surrounded by deep flood water. People need rescue and dry rations immediately.",
+      "lat": 11.8304,
+      "lon": 13.1519,
+      "ts": "2024-09-10T05:05:00Z"
+    }
+  ]
+}

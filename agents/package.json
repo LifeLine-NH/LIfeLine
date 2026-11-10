@@ -1,0 +1,29 @@
+{
+  "name": "@lifeline/agents",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "LIFELINE intake clustering, external evidence tools, 4-verifier AI swarm, and NGO bidder bots on NEAR",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "swarm:run": "tsx src/cli.ts run",
+    "demo:replay": "tsx src/cli.ts replay-all"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "near-api-js": "^4.0.3",
+    "ngeohash": "^0.6.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/ngeohash": "^0.6.8",
+    "@types/node": "^20.14.10",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.4"
+  }
+}

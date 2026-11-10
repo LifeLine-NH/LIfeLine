@@ -149,7 +149,7 @@ export async function executeSwarmScenario(
  */
 export async function handleSwarmRunHttp(request: Request): Promise<Response> {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as Partial<SwarmRunRequest>;
     const trace = await executeSwarmScenario(body);
     return new Response(JSON.stringify(trace, null, 2), {
       status: 200,

@@ -1,5 +1,4 @@
 import { connect, KeyPair, keyStores, type Near } from "near-api-js";
-import type { KeyPairString } from "near-api-js/lib/utils/key_pair.js";
 import type { CaseStatus, Verdict, VerifierRole } from "../schemas/index.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -147,7 +146,7 @@ export class LifelineChainClient {
         const accountId = DEFAULT_ACCOUNTS[role];
         const privKey = ENV_PRIVATE_KEYS[role];
         if (privKey) {
-          const kp = KeyPair.fromString(privKey as KeyPairString);
+          const kp = KeyPair.fromString(privKey as Parameters<typeof KeyPair.fromString>[0]);
           await keyStore.setKey(this.networkId, accountId, kp);
         }
       }

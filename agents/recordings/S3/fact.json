@@ -1,0 +1,5 @@
+{
+  "verdict": "No",
+  "confidence_bps": 9500,
+  "reasoning": "Claim contradicted by external tools: Open-Meteo recorded only 0.2mm precipitation (dry conditions) and neither GDACS nor ReliefWeb has any flood alert or report for the area."
+}

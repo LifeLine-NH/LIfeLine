@@ -123,8 +123,7 @@ export const stubChain: ChainReader = {
   async getNgo(accountId) {
     const ngo = NGOS[accountId];
     if (!ngo) return null;
-    const { name: _name, ...rest } = ngo;
-    return rest;
+    return { bond: ngo.bond, reputation: ngo.reputation, delivered: ngo.delivered, failed: ngo.failed, profile_hash: ngo.profile_hash };
   },
   async getDonations(from = 0, limit = 20) {
     return DONATIONS.slice(from, from + limit);

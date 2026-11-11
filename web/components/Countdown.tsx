@@ -1,18 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+function subscribe(onTick: () => void) {
+  const id = setInterval(onTick, 1000);
+  return () => clearInterval(id);
+}
+
+const nowSeconds = () => Math.floor(Date.now() / 1000);
 
 export function Countdown({ endsAtMs, endedText = "Closed" }: { endsAtMs: number; endedText?: string }) {
-  const [now, setNow] = useState<number | null>(null);
-
-  useEffect(() => {
-    setNow(Date.now());
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
+  const now = useSyncExternalStore(subscribe, nowSeconds, () => null);
 
   if (now === null) return <span>…</span>;
-  const left = Math.max(0, Math.floor((endsAtMs - now) / 1000));
+  const left = Math.max(0, Math.floor(endsAtMs / 1000) - now);
   if (left === 0) return <span>{endedText}</span>;
   const h = Math.floor(left / 3600);
   const m = Math.floor((left % 3600) / 60);

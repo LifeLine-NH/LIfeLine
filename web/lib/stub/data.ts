@@ -2,7 +2,6 @@ import type {
   Bid,
   Case,
   ContractConfig,
-  DeliveryVote,
   Donation,
   EvidenceBundle,
   ExternalEvidence,

@@ -1,30 +1,12 @@
 import { config } from "../config";
+import { viewFunction } from "../near/rpc";
 import type { ChainReader } from "./index";
 
-async function view<T>(method: string, args: Record<string, unknown> = {}): Promise<T> {
+const rpc = { url: config.rpcUrl };
+
+function view<T>(method: string, args: Record<string, unknown> = {}): Promise<T> {
   if (!config.contractId) throw new Error("NEXT_PUBLIC_CONTRACT_ID is not set");
-  const res = await fetch(config.rpcUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    cache: "no-store",
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: "lifeline-web",
-      method: "query",
-      params: {
-        request_type: "call_function",
-        finality: "final",
-        account_id: config.contractId,
-        method_name: method,
-        args_base64: Buffer.from(JSON.stringify(args)).toString("base64"),
-      },
-    }),
-  });
-  const body = await res.json();
-  if (body.error || body.result?.error) {
-    throw new Error(`${method} failed: ${JSON.stringify(body.error ?? body.result.error)}`);
-  }
-  return JSON.parse(Buffer.from(body.result.result).toString("utf8")) as T;
+  return viewFunction<T>(rpc, config.contractId, method, args);
 }
 
 // Method names follow section 5 of the shared plan. get_delivery_votes is not in that list yet: confirm with A.

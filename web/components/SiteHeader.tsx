@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ModeBadges } from "./ModeBadges";
+import { WalletButton } from "./WalletButton";
 
 const links = [
   { href: "/cases", label: "Cases" },
@@ -22,7 +23,10 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <ModeBadges />
+        <div className="flex flex-wrap items-center gap-3">
+          <ModeBadges />
+          <WalletButton />
+        </div>
       </div>
     </header>
   );

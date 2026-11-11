@@ -31,7 +31,7 @@ export async function CaseTable({ cases }: { cases: Case[] }) {
             return (
               <tr key={c.id} className="border-b border-line last:border-0 hover:bg-chalk/60">
                 <td className="px-4 py-3">
-                  <Link href={`/cases/${c.id}`} className="font-display text-lg font-bold text-tarp underline-offset-4 hover:underline">
+                  <Link href={`/cases/${c.id}`} className="font-display text-lg font-bold whitespace-nowrap text-tarp underline-offset-4 hover:underline">
                     {c.id}
                   </Link>
                 </td>

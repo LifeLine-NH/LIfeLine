@@ -28,11 +28,11 @@ async function FeaturedCase() {
 
   return (
     <div className="relative rounded-md border border-line bg-paper p-5 sm:p-7">
-      <div className="absolute top-5 right-5 sm:top-7 sm:right-7">
+      <div className="mb-5 sm:absolute sm:top-7 sm:right-7 sm:mb-0">
         <Stamp status={featured.status} land />
       </div>
       <p className="text-sm text-muted">Latest decision</p>
-      <h2 className="mt-1 max-w-[70%] font-display text-3xl font-extrabold break-all sm:text-4xl">{featured.id}</h2>
+      <h2 className="mt-1 font-display text-3xl font-extrabold break-all sm:max-w-[60%] sm:text-4xl">{featured.id}</h2>
       <p className="mt-2 text-muted">
         {bundle?.incident_type ? incidentLabel[bundle.incident_type] : "Incident"} reported by{" "}
         {bundle?.source_diversity ?? "?"} independent sources. Opened {formatTime(featured.opened_at)}.

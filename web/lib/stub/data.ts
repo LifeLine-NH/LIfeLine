@@ -68,7 +68,7 @@ function reports(texts: string[], start: string, sources: number) {
   const t0 = Date.parse(start);
   return texts.map((text, i) => ({
     source_type: i % 3 === 0 ? "sms_relay" : i % 3 === 1 ? "partner_relay" : "web_form",
-    source_id_hash: (i % sources + 1).toString(16).padStart(64, "a"),
+    source_id_hash: String((i % sources) + 1).repeat(64),
     text,
     ts: new Date(t0 + i * 9 * 60_000).toISOString(),
   }));
@@ -136,7 +136,7 @@ export const CASES: StubCaseSeed[] = [
       { role: "geo", verdict: "Yes", confidence_bps: 8800, reasoning: "Four separate sources, reports spread over 90 minutes, no single source dominates.", at: "2026-11-09T06:11:02Z" },
       { role: "fact", verdict: "Yes", confidence_bps: 8600, reasoning: "Two independent outside sources support a flood here in this window.", at: "2026-11-09T06:11:20Z" },
       { role: "sev", verdict: "Yes", confidence_bps: 8100, tier: 3, reasoning: "Hundreds of households cut off and a clinic affected. Tier 3.", at: "2026-11-09T06:11:24Z" },
-      { role: "red", verdict: "Yes", confidence_bps: 7400, reasoning: "Strongest objection was that reports could be coordinated. Rebutted: four sources and outside data agree.", objection: "Reports might come from one coordinated group.", at: "2026-11-09T06:11:31Z" },
+      { role: "red", verdict: "Yes", confidence_bps: 7400, reasoning: "Rebutted: four separate sources and two outside data sources agree.", objection: "Reports might come from one coordinated group.", at: "2026-11-09T06:11:31Z" },
     ],
     bids: [
       { ngo: ACCOUNTS.rapid, ask: usdc(4100), eta_hours: 6, plan_hash: "d1".repeat(32), at: ns("2026-11-09T06:11:50Z"), simulated: true },

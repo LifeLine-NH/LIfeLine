@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:e2e": "vitest run -c vitest.e2e.config.ts"
   },
   "dependencies": {
     "@hot-labs/near-connect": "0.12.0",

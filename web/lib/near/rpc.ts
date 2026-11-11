@@ -1,6 +1,6 @@
 // Minimal NEAR JSON-RPC client. Works in the browser and on the server, with no SDK dependency.
 
-export type RpcErrorKind = "network" | "timeout" | "rpc" | "contract" | "not_found";
+export type RpcErrorKind = "network" | "timeout" | "rpc" | "contract" | "no_contract" | "not_found";
 
 export class RpcError extends Error {
   constructor(
@@ -87,16 +87,32 @@ interface CallFunctionResult {
   logs: string[];
 }
 
-// Read-only contract call. A contract panic becomes an RpcError of kind "contract".
+// Read-only contract call. Missing account, missing code and contract panics each get their own kind.
 export async function viewFunction<T>(opts: RpcOptions, contractId: string, method: string, args: object = {}): Promise<T> {
-  const res = await rpcCall<CallFunctionResult>(opts, "query", {
-    request_type: "call_function",
-    finality: "final",
-    account_id: contractId,
-    method_name: method,
-    args_base64: toBase64(JSON.stringify(args)),
-  });
-  if (res.error) throw new RpcError(`${contractId}.${method} failed: ${res.error}`, "contract", res.error);
+  let res: CallFunctionResult;
+  try {
+    res = await rpcCall<CallFunctionResult>(opts, "query", {
+      request_type: "call_function",
+      finality: "final",
+      account_id: contractId,
+      method_name: method,
+      args_base64: toBase64(JSON.stringify(args)),
+    });
+  } catch (err) {
+    if (err instanceof RpcError && err.kind === "not_found") {
+      throw new RpcError(`The account ${contractId} doesn't exist on this network.`, "not_found", err.data);
+    }
+    throw err;
+  }
+  if (res.error) {
+    if (res.error.includes("CodeDoesNotExist")) {
+      throw new RpcError(`${contractId} has no contract deployed.`, "no_contract", res.error);
+    }
+    if (res.error.includes("MethodNotFound")) {
+      throw new RpcError(`${contractId} has no method called ${method}.`, "contract", res.error);
+    }
+    throw new RpcError(`${contractId}.${method} failed: ${res.error}`, "contract", res.error);
+  }
   const text = new TextDecoder().decode(Uint8Array.from(res.result ?? []));
   return (text ? JSON.parse(text) : null) as T;
 }

@@ -4,11 +4,13 @@ import { Suspense } from "react";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { Countdown } from "@/components/Countdown";
 import { HashCheck } from "@/components/HashCheck";
+import { ReadError } from "@/components/ReadError";
 import { AccountLink, TxLink } from "@/components/Links";
 import { SimulatedTag } from "@/components/ModeBadges";
 import { Stamp } from "@/components/Stamp";
 import { StatusTag } from "@/components/StatusTag";
 import { VoteSlip } from "@/components/VoteSlip";
+import { attempt } from "@/lib/attempt";
 import { chain } from "@/lib/chain";
 import { config } from "@/lib/config";
 import { getEvidence } from "@/lib/evidence";
@@ -300,17 +302,24 @@ function Evidence({ c, bundle }: { c: Case; bundle: EvidenceBundle | null }) {
 
 async function CaseFile({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const c = await chain.getCase(decodeURIComponent(id));
-  if (!c) notFound();
+  const res = await attempt(async () => {
+    const c = await chain.getCase(decodeURIComponent(id));
+    if (!c) return null;
+    const [votes, bids, delivery, cfg] = await Promise.all([
+      chain.getVotes(c.id),
+      chain.getBids(c.id),
+      chain.getDeliveryVotes(c.id),
+      chain.getConfig(),
+    ]);
+    return { c, votes, bids, delivery, cfg };
+  });
+  if (!res.ok) return <ReadError what="this case" message={res.message} />;
+  if (!res.value) notFound();
+  const { c, votes, bids, delivery, cfg } = res.value;
 
-  const [votes, bids, delivery, cfg, bundle] = await Promise.all([
-    chain.getVotes(c.id),
-    chain.getBids(c.id),
-    chain.getDeliveryVotes(c.id),
-    chain.getConfig(),
-    getEvidence(c.bundle_hash) as Promise<EvidenceBundle | null>,
-  ]);
-  const records = await Promise.all(votes.map((v) => getEvidence(v.evidence_hash) as Promise<VoteRecord | null>));
+  // Evidence lives off chain; if storage is down the onchain record still renders.
+  const bundle = (await getEvidence(c.bundle_hash).catch(() => null)) as EvidenceBundle | null;
+  const records = await Promise.all(votes.map((v) => getEvidence(v.evidence_hash).catch(() => null) as Promise<VoteRecord | null>));
 
   return (
     <div className="space-y-12">

@@ -9,7 +9,7 @@ export async function CaseTable({ cases }: { cases: Case[] }) {
     return <p className="rounded-md border border-dashed border-line bg-paper p-6 text-muted">No cases match this filter.</p>;
   }
 
-  const bundles = await Promise.all(cases.map((c) => getEvidence(c.bundle_hash) as Promise<EvidenceBundle | null>));
+  const bundles = await Promise.all(cases.map((c) => getEvidence(c.bundle_hash).catch(() => null) as Promise<EvidenceBundle | null>));
 
   return (
     <div className="overflow-x-auto rounded-md border border-line bg-paper">

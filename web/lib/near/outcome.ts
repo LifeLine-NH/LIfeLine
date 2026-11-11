@@ -83,7 +83,7 @@ export function collectEvents(outcome: FinalOutcome): NepEvent[] {
 }
 
 export function decodeSuccessValue(status: ExecutionStatus): unknown {
-  if (!isObj(status) || typeof status.SuccessValue !== "string") return undefined;
+  if (!isObj(status) || !("SuccessValue" in status) || typeof status.SuccessValue !== "string") return undefined;
   if (status.SuccessValue === "") return null;
   return JSON.parse(fromBase64(status.SuccessValue));
 }

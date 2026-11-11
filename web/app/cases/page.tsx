@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { CaseTable } from "@/components/CaseTable";
+import { ReadError } from "@/components/ReadError";
+import { attempt } from "@/lib/attempt";
 import { chain } from "@/lib/chain";
 import type { CaseStatus } from "@/lib/types";
 
@@ -18,7 +20,7 @@ const FILTERS: { label: string; status?: CaseStatus }[] = [
 async function FilteredCases({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   const { status } = await searchParams;
   const active = FILTERS.find((f) => f.status === status) ?? FILTERS[0];
-  const cases = await chain.listCases({ limit: 100, status: active.status });
+  const res = await attempt(() => chain.listCases({ limit: 100, status: active.status }));
 
   return (
     <>
@@ -39,7 +41,7 @@ async function FilteredCases({ searchParams }: { searchParams: Promise<{ status?
           );
         })}
       </nav>
-      <CaseTable cases={cases} />
+      {res.ok ? <CaseTable cases={res.value} /> : <ReadError what="cases" message={res.message} />}
     </>
   );
 }

@@ -2,7 +2,9 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { CaseTable } from "@/components/CaseTable";
 import { PoolLedger } from "@/components/PoolLedger";
+import { ReadError } from "@/components/ReadError";
 import { Stamp } from "@/components/Stamp";
+import { attempt } from "@/lib/attempt";
 import { chain } from "@/lib/chain";
 import { getEvidence } from "@/lib/evidence";
 import { formatTime, incidentLabel, roleLabel } from "@/lib/format";
@@ -16,14 +18,16 @@ const verdictCls: Record<Verdict, string> = {
 };
 
 async function FeaturedCase() {
-  const cases = await chain.listCases({ limit: 20 });
+  const res = await attempt(() => chain.listCases({ limit: 20 }));
+  if (!res.ok) return <ReadError what="cases" message={res.message} />;
+  const cases = res.value;
   const featured = cases.find((c) => c.status !== "Open") ?? cases[0];
   if (!featured) {
     return <p className="text-muted">No cases yet. The first verified report will appear here.</p>;
   }
   const [votes, bundle] = await Promise.all([
-    chain.getVotes(featured.id),
-    getEvidence(featured.bundle_hash) as Promise<EvidenceBundle | null>,
+    chain.getVotes(featured.id).catch(() => []),
+    getEvidence(featured.bundle_hash).catch(() => null) as Promise<EvidenceBundle | null>,
   ]);
 
   return (
@@ -64,8 +68,9 @@ async function FeaturedCase() {
 }
 
 async function RecentCases() {
-  const cases = await chain.listCases({ limit: 5 });
-  return <CaseTable cases={cases} />;
+  const res = await attempt(() => chain.listCases({ limit: 5 }));
+  if (!res.ok) return <ReadError what="cases" message={res.message} />;
+  return <CaseTable cases={res.value} />;
 }
 
 export default function Home() {

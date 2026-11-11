@@ -1,8 +1,12 @@
+import { attempt } from "@/lib/attempt";
 import { chain } from "@/lib/chain";
 import { formatAmount } from "@/lib/format";
+import { ReadError } from "./ReadError";
 
 export async function PoolLedger() {
-  const pool = await chain.getPool();
+  const res = await attempt(() => chain.getPool());
+  if (!res.ok) return <ReadError what="the pool" message={res.message} />;
+  const pool = res.value;
   const rows = [
     { label: "Available for new cases", value: formatAmount(pool.available), strong: true },
     { label: "Held for awarded cases", value: formatAmount(pool.reserved) },

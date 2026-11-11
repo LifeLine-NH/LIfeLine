@@ -71,6 +71,9 @@ export async function checkSetup(setup: DonateSetup): Promise<Blocker[]> {
   if (!setup.relief || !setup.token) {
     return [{ code: "setup", message: "The relief contract or pool token isn't configured on this site." }];
   }
+  if (!(await viewAccount(setup.rpc, setup.relief))) {
+    return [{ code: "setup", message: `The relief contract account ${setup.relief} doesn't exist on ${setup.network} yet, so donations are paused.` }];
+  }
   const registered = await storageBalanceOf(setup.rpc, setup.token, setup.relief);
   if (!registered) {
     blockers.push({
@@ -87,7 +90,11 @@ export async function checkSetup(setup: DonateSetup): Promise<Blocker[]> {
       });
     }
   } catch (err) {
-    if (!(err instanceof RpcError) || err.kind !== "contract") throw err;
+    if (err instanceof RpcError && err.kind === "no_contract") {
+      blockers.push({ code: "setup", message: `${setup.relief} exists but has no contract deployed yet, so donations are paused.` });
+    } else if (!(err instanceof RpcError) || err.kind !== "contract") {
+      throw err;
+    }
   }
   return blockers;
 }

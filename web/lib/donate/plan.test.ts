@@ -16,19 +16,23 @@ import {
 type Handler = (args: Record<string, unknown>) => unknown;
 
 // A stand-in NEAR RPC node: answers view calls and view_account the way the real node shapes them.
-function fakeRpc(views: Record<string, Handler>, accounts: Record<string, { amount: string; storage_usage: number }>) {
+type FakeAccount = { amount: string; storage_usage: number; noCode?: boolean };
+
+function fakeRpc(views: Record<string, Handler>, accounts: Record<string, FakeAccount>) {
   const fetchImpl = (async (_url: string, init: RequestInit) => {
     const { params } = JSON.parse(String(init.body));
     let result: unknown;
     let error: unknown;
     if (params.request_type === "view_account") {
       const acc = accounts[params.account_id];
-      if (acc) result = { ...acc, locked: "0" };
+      if (acc) result = { amount: acc.amount, storage_usage: acc.storage_usage, locked: "0" };
       else error = { name: "HANDLER_ERROR", cause: { name: "UNKNOWN_ACCOUNT", info: {} } };
     } else {
       const key = `${params.account_id}.${params.method_name}`;
       const handler = views[key];
-      if (!handler) result = { result: [], logs: [], error: `wasm execution failed: MethodNotFound (${key})` };
+      if (accounts[params.account_id]?.noCode) {
+        result = { result: [], logs: [], error: `wasm execution failed with error: CompilationError(CodeDoesNotExist { account_id: "${params.account_id}" })` };
+      } else if (!handler) result = { result: [], logs: [], error: `wasm execution failed: MethodNotFound (${key})` };
       else {
         const value = handler(JSON.parse(fromBase64(params.args_base64)));
         result = { result: Array.from(new TextEncoder().encode(JSON.stringify(value))), logs: [] };
@@ -43,7 +47,9 @@ const TOKEN = "usdc.lifeline.testnet";
 const RELIEF = "relief.lifeline.testnet";
 const near = (n: number) => (YOCTO_PER_NEAR * BigInt(Math.round(n * 1000))) / BigInt(1000);
 
-function setupWith(views: Record<string, Handler>, accounts: Record<string, { amount: string; storage_usage: number }> = {}): DonateSetup {
+const reliefAccount = { [RELIEF]: { amount: near(5).toString(), storage_usage: 300_000 } };
+
+function setupWith(views: Record<string, Handler>, accounts: Record<string, FakeAccount> = reliefAccount): DonateSetup {
   return { rpc: fakeRpc(views, accounts), network: "testnet", relief: RELIEF, token: TOKEN, msg: "", gasTgas: 150 };
 }
 
@@ -70,7 +76,7 @@ describe("loadToken and loadDonor", () => {
   });
 
   it("subtracts storage staking from the NEAR available for gas", async () => {
-    const setup = setupWith(tokenViews, { "amina.testnet": { amount: near(1).toString(), storage_usage: 10_000 } });
+    const setup = setupWith(tokenViews, { ...reliefAccount, "amina.testnet": { amount: near(1).toString(), storage_usage: 10_000 } });
     const state = await loadDonor(setup, "amina.testnet");
     expect(state.nearAvailable).toBe(near(1) - BigInt(10_000) * BigInt(10) ** BigInt(19));
     expect(state.tokenBalance).toBe(BigInt(75_000_000));
@@ -103,6 +109,17 @@ describe("checkSetup", () => {
 
   it("tolerates a contract without get_config", async () => {
     expect(await checkSetup(setupWith(tokenViews))).toEqual([]);
+  });
+
+  it("pauses donations when the relief account doesn't exist yet", async () => {
+    const blockers = await checkSetup(setupWith(tokenViews, {}));
+    expect(blockers).toHaveLength(1);
+    expect(blockers[0].message).toMatch(/doesn't exist on testnet yet/);
+  });
+
+  it("pauses donations when the relief account has no contract deployed", async () => {
+    const blockers = await checkSetup(setupWith(tokenViews, { [RELIEF]: { ...reliefAccount[RELIEF], noCode: true } }));
+    expect(blockers.map((b) => b.message).join(" ")).toMatch(/no contract deployed/);
   });
 });
 

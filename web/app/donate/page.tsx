@@ -1,13 +1,16 @@
 import { Suspense } from "react";
 import { AccountLink, TxLink } from "@/components/Links";
-import { NotConnected } from "@/components/NotConnected";
 import { PoolLedger } from "@/components/PoolLedger";
+import { ReadError } from "@/components/ReadError";
+import { attempt } from "@/lib/attempt";
 import { chain } from "@/lib/chain";
-import { config } from "@/lib/config";
 import { formatAmount, formatTime } from "@/lib/format";
+import { DonateForm } from "./DonateForm";
 
 async function RecentDonations() {
-  const donations = await chain.getDonations(0, 20);
+  const res = await attempt(() => chain.getDonations(0, 20));
+  if (!res.ok) return <ReadError what="donations" message={res.message} />;
+  const donations = res.value;
   if (donations.length === 0) {
     return <p className="text-muted">No donations yet. The first one will show here with its transaction.</p>;
   }
@@ -35,37 +38,9 @@ export default function DonatePage() {
           verifiers approved, within the limits written into the contract.
         </p>
 
-        <form className="mt-8 max-w-md space-y-4" aria-describedby="donate-status">
-          <div>
-            <label htmlFor="amount" className="block font-semibold">
-              Amount in {config.tokenSymbol}
-            </label>
-            <input
-              id="amount"
-              name="amount"
-              type="number"
-              min="1"
-              step="1"
-              inputMode="decimal"
-              placeholder="50"
-              disabled
-              className="mt-1 w-full rounded border border-line bg-paper px-3 py-2 text-lg disabled:opacity-60"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled
-            className="rounded bg-tarp px-5 py-2.5 font-semibold text-white disabled:opacity-50"
-          >
-            Connect wallet and donate
-          </button>
-          <div id="donate-status">
-            <NotConnected>
-              Donations open once the relief contract is live on testnet. You&apos;ll connect a NEAR wallet and send test
-              tokens, with a button to get some first.
-            </NotConnected>
-          </div>
-        </form>
+        <div className="mt-8">
+          <DonateForm />
+        </div>
 
         <h2 className="mt-12 font-display text-3xl font-bold">Recent donations</h2>
         <div className="mt-4">

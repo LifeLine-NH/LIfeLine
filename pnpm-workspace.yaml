@@ -1,7 +1,9 @@
 packages:
-  - "agents"
-  - "web"
+  - agents
+  - web
 
 allowBuilds:
   esbuild: true
+  near-sandbox: true
+  near-workspaces: true
   secp256k1: true

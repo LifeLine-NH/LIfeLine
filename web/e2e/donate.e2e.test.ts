@@ -2,7 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { type NearAccount, Worker } from "near-workspaces";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { confirmDonation } from "@/lib/donate/confirm";
+import { confirmDonation, waitForFinal } from "@/lib/donate/confirm";
 import { buildDonateTransaction, checkSetup, type DonateSetup, evaluateDonation, loadDonor, loadToken, type PlannedTransaction } from "@/lib/donate/plan";
 
 // End to end on a local NEAR sandbox: the real NEP-141 token (near-sdk-rs example) and the "defi"
@@ -52,7 +52,9 @@ beforeAll(async () => {
   for (const a of [relief, donor]) {
     await root.call(token, "storage_deposit", { account_id: a.accountId }, { attachedDeposit: STORAGE_DEPOSIT });
   }
-  await root.call(token, "ft_transfer", { receiver_id: donor.accountId, amount: "500000000" }, { attachedDeposit: BigInt(1) });
+  const funded = await root.callRaw(token, "ft_transfer", { receiver_id: donor.accountId, amount: "500000000" }, { attachedDeposit: BigInt(1) });
+  // Our reads use finality "final", like the site; wait until the setup is final before reading it.
+  await waitForFinal({ url: rpcUrl }, funded.result.transaction.hash, root.accountId);
 }, 180_000);
 
 afterAll(async () => {

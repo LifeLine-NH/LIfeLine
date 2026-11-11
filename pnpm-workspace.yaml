@@ -1,0 +1,7 @@
+packages:
+  - "agents"
+  - "web"
+
+allowBuilds:
+  esbuild: true
+  secp256k1: true

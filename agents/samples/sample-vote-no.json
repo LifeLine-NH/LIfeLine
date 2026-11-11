@@ -1,0 +1,22 @@
+{
+  "case_id": "s458w-2025-01-15-001",
+  "agent": "red",
+  "model": "gpt-4o-mini",
+  "verdict": "No",
+  "confidence_bps": 9600,
+  "tier": 0,
+  "strongest_objection": "All 12 reports repeat unnatural 'flood' keyword stuffing within 11 minutes during the peak dry season, while Open-Meteo records 0.0mm precipitation and neither GDACS nor ReliefWeb has any flood alert; report #12 also contains an explicit prompt-injection attempt.",
+  "can_be_rebutted": false,
+  "reasoning": "Adversarial check failed: external meteorological and humanitarian feeds directly contradict the claimed flood, and report phrasing exhibits coordinated keyword stuffing and prompt injection.",
+  "tool_calls": [
+    {
+      "tool": "open-meteo",
+      "claim": "No significant rainfall: 0mm total precipitation recorded over window (dry conditions)",
+      "supports": "no",
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=12.00&longitude=8.59&start_date=2025-01-13&end_date=2025-01-15&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+      "retrieved_at": "2025-01-15T10:20:00Z",
+      "raw_hash": "b293e1c554f8c0142632ba3f8a962356c9e8bae42356b293e1c554f8c0142632"
+    }
+  ],
+  "attestation": null
+}

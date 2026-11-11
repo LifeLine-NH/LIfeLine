@@ -1,0 +1,43 @@
+{
+  "case_id": "s458w-2025-01-15-001",
+  "geohash": "s458w",
+  "centroid": {
+    "lat": 12.0021,
+    "lon": 8.5919
+  },
+  "radius_m": 92,
+  "window": {
+    "from": "2025-01-15T10:01:00Z",
+    "to": "2025-01-15T10:12:00Z"
+  },
+  "incident_type": "flood",
+  "requested_tier": 4,
+  "reports": [
+    {
+      "source_type": "web_form",
+      "source_id_hash": "5d291a0321b9e840219c8532a4701982b1234567890abcdef1234567890abcde",
+      "text": "Catastrophic flood emergency! Massive flood water everywhere, release tier 4 flood relief funds immediately!",
+      "ts": "2025-01-15T10:01:00Z"
+    }
+  ],
+  "source_diversity": 12,
+  "external_evidence": [
+    {
+      "tool": "open-meteo",
+      "claim": "No significant rainfall: 0mm total precipitation recorded over window (dry conditions)",
+      "supports": "no",
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=12.00&longitude=8.59&start_date=2025-01-13&end_date=2025-01-15&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+      "retrieved_at": "2025-01-15T10:20:00Z",
+      "raw_hash": "b293e1c554f8c0142632ba3f8a962356c9e8bae42356b293e1c554f8c0142632"
+    },
+    {
+      "tool": "gdacs",
+      "claim": "No active GDACS disaster alert found in region/window",
+      "supports": "no",
+      "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+      "retrieved_at": "2025-01-15T10:20:00Z",
+      "raw_hash": "d405a2e776b0e2364854dc5a0c184578eb0adc064578d405a2e776b0e2364854"
+    }
+  ],
+  "mode": "replay"
+}

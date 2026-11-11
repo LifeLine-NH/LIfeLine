@@ -1,0 +1,6 @@
+{
+  "verdict": "No",
+  "confidence_bps": 9500,
+  "tier": 1,
+  "reasoning": "Assigning Severity Tier 1 (No Funding): Despite 12 reports demanding Tier 4 flood funds, Open-Meteo shows 0.0mm precipitation and GDACS/ReliefWeb show zero alerts."
+}

@@ -1,0 +1,5 @@
+{
+  "verdict": "No",
+  "confidence_bps": 9700,
+  "reasoning": "Zero external evidence tools support the flood claim. Open-Meteo shows 0.0mm total precipitation (dry conditions), GDACS reports 0 active alerts, and ReliefWeb has 0 humanitarian reports for this region/window."
+}

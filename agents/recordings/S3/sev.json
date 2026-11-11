@@ -1,0 +1,6 @@
+{
+  "verdict": "No",
+  "confidence_bps": 9400,
+  "tier": 1,
+  "reasoning": "Assigning Severity Tier 1 (No Funding): All 30 reports originate from a single source_id (source_diversity=1) with no corroborating weather or humanitarian evidence."
+}

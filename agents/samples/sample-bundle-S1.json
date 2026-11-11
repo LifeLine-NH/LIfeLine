@@ -1,0 +1,55 @@
+{
+  "case_id": "s64u1-2024-09-10-001",
+  "geohash": "s64u1",
+  "centroid": {
+    "lat": 11.8312,
+    "lon": 13.1512
+  },
+  "radius_m": 248,
+  "window": {
+    "from": "2024-09-10T04:15:00Z",
+    "to": "2024-09-10T05:05:00Z"
+  },
+  "incident_type": "flood",
+  "requested_tier": 3,
+  "reports": [
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "8c1497461bc8328640729f2304596f7a98d29a1e3958ca7e7b31a8a49c964e2b",
+      "text": "Water from Alau Dam has breached river banks into Gwange and Maiduguri central. Streets under 1.5m of water, families trapped on roofs.",
+      "ts": "2024-09-10T04:15:00Z"
+    },
+    {
+      "source_type": "partner_relay",
+      "source_id_hash": "e0494f04810829c31786526d27229492a76524e6c7b407d8b5a0441d675b6d85",
+      "text": "Urgent: Custom Bridge and Lagos Street in Maiduguri overtopped by rapid flash floodwaters following Alau Dam overflow. Evacuation boats needed.",
+      "ts": "2024-09-10T04:28:00Z"
+    },
+    {
+      "source_type": "web_form",
+      "source_id_hash": "127494f15f63a8b55d9d01440d0c597926c40b24f68c8971a93420a180d897b3",
+      "text": "Heavy flooding across Maiduguri metropolitan area since 4am. Over 500 displaced households gathering at high ground near post office.",
+      "ts": "2024-09-10T04:42:00Z"
+    }
+  ],
+  "source_diversity": 3,
+  "external_evidence": [
+    {
+      "tool": "open-meteo",
+      "claim": "Severe rainfall anomaly detected: peak 112.4mm/24h (215.1mm cumulative over window)",
+      "supports": "yes",
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=11.83&longitude=13.15&start_date=2024-09-08&end_date=2024-09-10&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+      "retrieved_at": "2024-09-10T06:00:00Z",
+      "raw_hash": "a182d0b443e7b9031521a92e79851245b8f7a9d31245a182d0b443e7b9031521"
+    },
+    {
+      "tool": "gdacs",
+      "claim": "GDACS Red Alert: Flood in Nigeria (Borno State / Maiduguri) — Extreme flood impact following Alau Dam breach; estimated >200,000 displaced in Maiduguri",
+      "supports": "yes",
+      "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+      "retrieved_at": "2024-09-10T06:00:00Z",
+      "raw_hash": "c394f1d665a9d1253743cb4f9b073467daf9cbf53467c394f1d665a9d1253743"
+    }
+  ],
+  "mode": "replay"
+}

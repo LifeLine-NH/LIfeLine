@@ -1,0 +1,18 @@
+{
+  "totalCount": 2,
+  "data": [
+    {
+      "id": "4093812",
+      "score": 1.0,
+      "fields": {
+        "title": "Nigeria: Maiduguri Flash Update #1 - Alau Dam Breach & Severe Flooding (10 Sep 2024)",
+        "date": { "created": "2024-09-10T05:30:00+00:00" },
+        "primary_country": { "name": "Nigeria", "iso3": "nga" },
+        "disaster_type": [{ "name": "Flash Flood" }, { "name": "Flood" }],
+        "body": "Severe flooding hit Maiduguri Metropolitan Council on 10 September 2024 following the overflow and breach of the Alau Dam. Multiple wards including Gwange, Shehuri, and Custom are submerged."
+      }
+    }
+  ],
+  "retrieved_at": "2024-09-10T06:00:00Z",
+  "source_url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Maiduguri+flood+2024"
+}

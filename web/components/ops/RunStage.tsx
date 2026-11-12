@@ -5,7 +5,7 @@ import { QuorumSeal } from "@/components/case/QuorumSeal";
 import { LogoMark } from "@/components/layout/Logo";
 import { ROLES, roleLabel } from "@/lib/format";
 import { RULES } from "@/lib/rules";
-import type { RunScript } from "@/lib/scenarios";
+import { type RunScript, SCENARIOS } from "@/lib/scenarios";
 import type { Verdict } from "@/lib/types";
 import { totalSteps, useRun } from "./useRun";
 
@@ -21,19 +21,9 @@ const UPPER: React.CSSProperties = { font: "600 12px/1 var(--font-body)", letter
 
 // Large screen run view for the demo video. Dark, readable from a distance, steps every 1.4s.
 export function RunStage({ scripts, dataLabel, dataCls, agentsLabel }: { scripts: RunScript[]; dataLabel: string; dataCls: string; agentsLabel: string }) {
-  const { script, step, running, run, pick } = useRun(scripts, 1400);
-  if (!script) {
-    return (
-      <div className="stage fixed inset-0 z-50 grid place-items-center p-8 text-center">
-        <div className="flex flex-col items-center gap-4">
-          <p style={{ fontSize: 20 }}>No recorded scenario runs on the contract yet.</p>
-          <Link href="/ops" style={{ color: "var(--stage-accent)" }}>
-            Back to the ops console
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const r = useRun(scripts, 1400);
+  const { step, running, pending, error, start, pick } = r;
+  const script = r.script ?? { key: SCENARIOS[0].key, name: SCENARIOS[0].name, caseId: "", title: "Ready to run", meta: "Press Run to send the reports to the four verifiers", reports: [], votes: [], decision: { word: "Counting", tone: "progress" as const, sub: "0 of 4 voted", line: "", funded: false }, events: [] };
 
   const total = totalSteps(script);
   const voteOf = (i: number) => script.votes.find((v) => v.role === ROLES[i]);
@@ -58,7 +48,7 @@ export function RunStage({ scripts, dataLabel, dataCls, agentsLabel }: { scripts
           LifeLine ops
         </Link>
         <div role="group" aria-label="Scenario" className="flex gap-1.5" style={{ background: "var(--stage-2)", padding: 4, borderRadius: 12, border: "1px solid var(--stage-line)" }}>
-          {scripts.map((s) => {
+          {SCENARIOS.map((s) => {
             const on = s.key === script.key;
             return (
               <button
@@ -66,6 +56,7 @@ export function RunStage({ scripts, dataLabel, dataCls, agentsLabel }: { scripts
                 type="button"
                 aria-pressed={on}
                 onClick={() => pick(s.key)}
+                disabled={running}
                 style={{ height: 34, padding: "0 14px", borderRadius: 8, border: 0, cursor: "pointer", font: "700 14px/1 var(--font-body)", background: on ? "#F2F1EC" : "transparent", color: on ? "#0E1014" : "#A9ADB9" }}
               >
                 {s.key}
@@ -78,12 +69,16 @@ export function RunStage({ scripts, dataLabel, dataCls, agentsLabel }: { scripts
           {running && (
             <>
               <span className="live-dot" />
-              <span style={{ color: "#F2F1EC", fontWeight: 600 }}>Replaying</span>
+              <span style={{ color: "#F2F1EC", fontWeight: 600 }}>{pending ? "Agents working" : "Running"}</span>
             </>
           )}
-          <span className="num">
-            Step {step + 1} of {total}
-          </span>
+          {error ? (
+            <span role="alert" style={{ color: "#FF7A5C", fontWeight: 600, maxWidth: 360 }} title={error}>
+              Run failed: {error.length > 80 ? `${error.slice(0, 80)}…` : error}
+            </span>
+          ) : (
+            <span className="num">{pending ? "Waiting for the agents" : `Step ${step + 1} of ${total}`}</span>
+          )}
         </span>
         <span className="flex gap-1.5">
           <span className={`mode ${dataCls}`} style={{ cursor: "default" }}>
@@ -99,11 +94,11 @@ export function RunStage({ scripts, dataLabel, dataCls, agentsLabel }: { scripts
         </span>
         <button
           type="button"
-          onClick={() => run(script.key)}
+          onClick={() => start(script.key)}
           disabled={running}
           style={{ height: 44, padding: "0 20px", borderRadius: 10, border: 0, background: "#F2F1EC", color: "#0E1014", font: "700 15px/1 var(--font-body)", cursor: running ? "progress" : "pointer", opacity: running ? 0.7 : 1 }}
         >
-          {running ? "Replaying…" : step >= total - 1 ? "Replay again" : "Replay"}
+          {running ? "Running…" : `Run ${script.key}`}
         </button>
       </div>
 
@@ -133,7 +128,7 @@ export function RunStage({ scripts, dataLabel, dataCls, agentsLabel }: { scripts
           {ROLES.map((role, i) => {
             const v = voteOf(i);
             const voted = !!v && step >= 2 + i;
-            const thinking = !voted && step >= 1 && !!v;
+            const thinking = pending || (!voted && step >= 1 && !!v);
             const [col, icon, word] = v ? VS[v.verdict] : ["#5E6372", "", ""];
             return (
               <div
@@ -169,7 +164,7 @@ export function RunStage({ scripts, dataLabel, dataCls, agentsLabel }: { scripts
                     <span style={{ font: "700 22px/1 var(--font-display)", letterSpacing: "-0.02em" }}>{roleLabel[role].name}</span>
                     <span style={{ fontSize: 13, color: "var(--stage-ink-2)" }}>{roleLabel[role].short}</span>
                   </div>
-                  {!voted && !thinking && <span style={{ color: "#5E6372", fontSize: 16 }}>{v ? "Waiting for the case" : "No vote recorded"}</span>}
+                  {!voted && !thinking && <span style={{ color: "#5E6372", fontSize: 16 }}>{v || !script.caseId ? "Waiting for the case" : "No vote recorded"}</span>}
                   {thinking && (
                     <span className="flex items-center gap-3" style={{ color: "var(--stage-ink-2)", fontSize: 16 }}>
                       <span className="think">
@@ -182,7 +177,9 @@ export function RunStage({ scripts, dataLabel, dataCls, agentsLabel }: { scripts
                   )}
                   {voted && (
                     <div className="arrive flex flex-col gap-1.5">
-                      <span style={{ fontSize: 17, lineHeight: 1.35, color: "#F2F1EC" }}>{v!.reason ?? "Reasoning not in evidence storage."}</span>
+                      <span title={v!.reason ?? undefined} style={{ fontSize: 17, lineHeight: 1.35, color: "#F2F1EC", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                        {v!.reason ?? "Reasoning not in evidence storage."}
+                      </span>
                       {v!.tx &&
                         (v!.txUrl ? (
                           <a className="mono" href={v!.txUrl} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "var(--stage-accent)" }}>

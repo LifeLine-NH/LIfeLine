@@ -1,0 +1,337 @@
+{
+  "scenario_id": "S5",
+  "case_id": "s6177-2024-09-10-001-s5",
+  "mode": "replay",
+  "chain_mode": "stub",
+  "bundle_hash": "813775588298b3204a08c036aad717eb93ec97c2f0d445b9415e60479667b272",
+  "bundle": {
+    "case_id": "s6177-2024-09-10-001-s5",
+    "geohash": "s6177",
+    "centroid": {
+      "lat": 11.8315,
+      "lon": 13.151
+    },
+    "radius_m": 291,
+    "window": {
+      "from": "2024-09-10T04:15:00.000Z",
+      "to": "2024-09-10T04:55:00.000Z"
+    },
+    "incident_type": "flood",
+    "requested_tier": 3,
+    "reports": [
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "86b4b9e3fe868d452a1ea103523255bbc35846f8b756c2b2f31538686c31f527",
+        "text": "Water from Alau Dam has breached river banks into Gwange and Maiduguri central. Streets under 1.5m of water, families trapped on roofs.",
+        "ts": "2024-09-10T04:15:00Z"
+      },
+      {
+        "source_type": "partner_relay",
+        "source_id_hash": "a63c7e77e75db2738267ccd02d4138e3866dc2255d112865d75487fba7a6dfd8",
+        "text": "Urgent: Custom Bridge and Lagos Street in Maiduguri overtopped by rapid flash floodwaters following Alau Dam overflow. Evacuation boats needed.",
+        "ts": "2024-09-10T04:28:00Z"
+      },
+      {
+        "source_type": "web_form",
+        "source_id_hash": "2d08c06f1b7ff3cf9e8d199a36f80f615e8bec2ea61be9af184a150e2fc3a4e8",
+        "text": "Heavy flooding across Maiduguri metropolitan area since 4am. Over 500 displaced households gathering at high ground near post office.",
+        "ts": "2024-09-10T04:42:00Z"
+      },
+      {
+        "source_type": "partner_relay",
+        "source_id_hash": "ef98a5e30721264014462148eb6511446d2468c8827b203c1a82de97c937bbbf",
+        "text": "Confirmed dam breach impact in Maiduguri. Clean water sources contaminated, immediate shelter and WASH kits required for displaced families.",
+        "ts": "2024-09-10T04:55:00Z"
+      }
+    ],
+    "source_diversity": 4,
+    "external_evidence": [
+      {
+        "tool": "open-meteo",
+        "claim": "Severe rainfall anomaly detected: peak 112.4mm/24h (215.1mm cumulative over window)",
+        "supports": "yes",
+        "url": "https://archive-api.open-meteo.com/v1/archive?latitude=11.83&longitude=13.15&start_date=2024-09-08&end_date=2024-09-10&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+        "retrieved_at": "2024-09-10T06:00:00Z",
+        "raw_hash": "7c868349016505c0528a900f0791112f48630b0c2d440a643733a8f7fb9a3473"
+      },
+      {
+        "tool": "gdacs",
+        "claim": "GDACS Red Alert: Flood in Nigeria (Borno State / Maiduguri) — Extreme flood impact following Alau Dam breach; estimated >200,000 displaced in Maiduguri",
+        "supports": "yes",
+        "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+        "retrieved_at": "2024-09-10T06:00:00Z",
+        "raw_hash": "46400167b56cfbb0f0b00e3bc1257bc4283bbc2740e537c9937abb9f570addfe"
+      },
+      {
+        "tool": "reliefweb",
+        "claim": "ReliefWeb situation report confirmed (1 matches): \"Nigeria: Maiduguri Flash Update #1 - Alau Dam Breach & Severe Flooding (10 Sep 2024)\"",
+        "supports": "yes",
+        "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Maiduguri+flood+2024",
+        "retrieved_at": "2024-09-10T06:00:00Z",
+        "raw_hash": "67aa18d4e7138a062b16de308c2107e383691ae9548a5fe93266c41030b7fea2"
+      },
+      {
+        "tool": "usgs",
+        "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+        "supports": "unclear",
+        "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=11.83&longitude=13.15&maxradiuskm=150&starttime=2024-09-09&endtime=2024-09-11",
+        "retrieved_at": "2024-09-10T06:00:00Z",
+        "raw_hash": "08a27e7cebf7ae3e6a32a6d821c69e56c51094bdb8342e6fff47624393560cef"
+      }
+    ],
+    "mode": "replay"
+  },
+  "submit_tx_hash": "sbx_0b34c8a99eeda8c8e8cb2297322ea5cff5563474",
+  "verifier_steps": [
+    {
+      "role": "geo",
+      "signer_account": "v-geo.lifeline-demo.testnet",
+      "vote_record": {
+        "case_id": "s6177-2024-09-10-001-s5",
+        "agent": "geo",
+        "model": "deterministic-cluster-v1",
+        "verdict": "Yes",
+        "confidence_bps": 9100,
+        "tier": 0,
+        "reasoning": "Spatio-temporal cluster verified: source_diversity=4, max single-source share=25.0% (<=40%), radius=291m, window spread=2400s.",
+        "tool_calls": [],
+        "attestation": null
+      },
+      "evidence_hash": "dc29de3a1a6d4a11b5b3753866b3742542c94f79ee360861b7997d4b66729353",
+      "tx_hash": "sbx_9fb05fb522775f05e666d9babe77408eaab682f4",
+      "duration_ms": 1
+    },
+    {
+      "role": "fact",
+      "signer_account": "v-fact.lifeline-demo.testnet",
+      "vote_record": {
+        "case_id": "s6177-2024-09-10-001-s5",
+        "agent": "fact",
+        "model": "fireworks::accounts/fireworks/models/llama-v3p1-70b-instruct (replay)",
+        "verdict": "Yes",
+        "confidence_bps": 9400,
+        "tier": 0,
+        "reasoning": "Claim verified by 3 independent external sources: (1) open-meteo recorded 112.4mm/24h extreme rainfall anomaly, (2) gdacs issued a Red Flood Alert for Maiduguri/Borno State, and (3) reliefweb published UN OCHA Flash Update #1 confirming the Alau Dam breach.",
+        "tool_calls": [
+          {
+            "tool": "open-meteo",
+            "claim": "Severe rainfall anomaly detected: peak 112.4mm/24h (215.1mm cumulative over window)",
+            "supports": "yes",
+            "url": "https://archive-api.open-meteo.com/v1/archive?latitude=11.83&longitude=13.15&start_date=2024-09-08&end_date=2024-09-10&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "7c868349016505c0528a900f0791112f48630b0c2d440a643733a8f7fb9a3473"
+          },
+          {
+            "tool": "gdacs",
+            "claim": "GDACS Red Alert: Flood in Nigeria (Borno State / Maiduguri) — Extreme flood impact following Alau Dam breach; estimated >200,000 displaced in Maiduguri",
+            "supports": "yes",
+            "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "46400167b56cfbb0f0b00e3bc1257bc4283bbc2740e537c9937abb9f570addfe"
+          },
+          {
+            "tool": "reliefweb",
+            "claim": "ReliefWeb situation report confirmed (1 matches): \"Nigeria: Maiduguri Flash Update #1 - Alau Dam Breach & Severe Flooding (10 Sep 2024)\"",
+            "supports": "yes",
+            "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Maiduguri+flood+2024",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "67aa18d4e7138a062b16de308c2107e383691ae9548a5fe93266c41030b7fea2"
+          },
+          {
+            "tool": "usgs",
+            "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+            "supports": "unclear",
+            "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=11.83&longitude=13.15&maxradiuskm=150&starttime=2024-09-09&endtime=2024-09-11",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "08a27e7cebf7ae3e6a32a6d821c69e56c51094bdb8342e6fff47624393560cef"
+          }
+        ],
+        "attestation": null
+      },
+      "evidence_hash": "5f0fb747c8029b51d89ad3a9e3293b7e0026cfb3ab2d1f44d5862ab59ad8bf72",
+      "tx_hash": "sbx_c7da675584300fc960557f2a4020bb823f5ffd7f",
+      "duration_ms": 0
+    },
+    {
+      "role": "sev",
+      "signer_account": "v-sev.lifeline-demo.testnet",
+      "vote_record": {
+        "case_id": "s6177-2024-09-10-001-s5",
+        "agent": "sev",
+        "model": "fireworks::accounts/fireworks/models/qwen2p5-72b-instruct (replay)",
+        "verdict": "Yes",
+        "confidence_bps": 9200,
+        "tier": 3,
+        "reasoning": "Proposing Severity Tier 3 (Major Regional Disaster): Alau Dam spillway failure combined with 112.4mm/24h rainfall and a GDACS Red Alert has submerged multiple Maiduguri wards.",
+        "tool_calls": [
+          {
+            "tool": "open-meteo",
+            "claim": "Severe rainfall anomaly detected: peak 112.4mm/24h (215.1mm cumulative over window)",
+            "supports": "yes",
+            "url": "https://archive-api.open-meteo.com/v1/archive?latitude=11.83&longitude=13.15&start_date=2024-09-08&end_date=2024-09-10&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "7c868349016505c0528a900f0791112f48630b0c2d440a643733a8f7fb9a3473"
+          },
+          {
+            "tool": "gdacs",
+            "claim": "GDACS Red Alert: Flood in Nigeria (Borno State / Maiduguri) — Extreme flood impact following Alau Dam breach; estimated >200,000 displaced in Maiduguri",
+            "supports": "yes",
+            "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "46400167b56cfbb0f0b00e3bc1257bc4283bbc2740e537c9937abb9f570addfe"
+          },
+          {
+            "tool": "reliefweb",
+            "claim": "ReliefWeb situation report confirmed (1 matches): \"Nigeria: Maiduguri Flash Update #1 - Alau Dam Breach & Severe Flooding (10 Sep 2024)\"",
+            "supports": "yes",
+            "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Maiduguri+flood+2024",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "67aa18d4e7138a062b16de308c2107e383691ae9548a5fe93266c41030b7fea2"
+          },
+          {
+            "tool": "usgs",
+            "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+            "supports": "unclear",
+            "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=11.83&longitude=13.15&maxradiuskm=150&starttime=2024-09-09&endtime=2024-09-11",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "08a27e7cebf7ae3e6a32a6d821c69e56c51094bdb8342e6fff47624393560cef"
+          }
+        ],
+        "attestation": null
+      },
+      "evidence_hash": "ef5144a0a75aa577990d609fb3a4d998026cc87c6ea59b449517de5720f2a840",
+      "tx_hash": "sbx_1ba9e9b3fae8d7177495a5abd7ccc69e20565eb7",
+      "duration_ms": 0
+    },
+    {
+      "role": "red",
+      "signer_account": "v-red.lifeline-demo.testnet",
+      "vote_record": {
+        "case_id": "s6177-2024-09-10-001-s5",
+        "agent": "red",
+        "model": "gpt-4o-mini (replay)",
+        "verdict": "Yes",
+        "confidence_bps": 8900,
+        "tier": 0,
+        "reasoning": "Objection is fully rebutted by 3 independent external sources: Open-Meteo (112.4mm/24h rain), GDACS Red Alert, and UN OCHA ReliefWeb situation report.",
+        "strongest_objection": "Field reports could be exaggerating routine seasonal rain into a dam breach emergency.",
+        "can_be_rebutted": true,
+        "tool_calls": [
+          {
+            "tool": "open-meteo",
+            "claim": "Severe rainfall anomaly detected: peak 112.4mm/24h (215.1mm cumulative over window)",
+            "supports": "yes",
+            "url": "https://archive-api.open-meteo.com/v1/archive?latitude=11.83&longitude=13.15&start_date=2024-09-08&end_date=2024-09-10&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "7c868349016505c0528a900f0791112f48630b0c2d440a643733a8f7fb9a3473"
+          },
+          {
+            "tool": "gdacs",
+            "claim": "GDACS Red Alert: Flood in Nigeria (Borno State / Maiduguri) — Extreme flood impact following Alau Dam breach; estimated >200,000 displaced in Maiduguri",
+            "supports": "yes",
+            "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "46400167b56cfbb0f0b00e3bc1257bc4283bbc2740e537c9937abb9f570addfe"
+          },
+          {
+            "tool": "reliefweb",
+            "claim": "ReliefWeb situation report confirmed (1 matches): \"Nigeria: Maiduguri Flash Update #1 - Alau Dam Breach & Severe Flooding (10 Sep 2024)\"",
+            "supports": "yes",
+            "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Maiduguri+flood+2024",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "67aa18d4e7138a062b16de308c2107e383691ae9548a5fe93266c41030b7fea2"
+          },
+          {
+            "tool": "usgs",
+            "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+            "supports": "unclear",
+            "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=11.83&longitude=13.15&maxradiuskm=150&starttime=2024-09-09&endtime=2024-09-11",
+            "retrieved_at": "2024-09-10T06:00:00Z",
+            "raw_hash": "08a27e7cebf7ae3e6a32a6d821c69e56c51094bdb8342e6fff47624393560cef"
+          }
+        ],
+        "attestation": null
+      },
+      "evidence_hash": "cf24e518305f704b1bce0362be90b26935ea9770861a730267b33dfb6e5af798",
+      "tx_hash": "sbx_900abaecb08e415e1b127892bd7157351ff9030a",
+      "duration_ms": 0
+    }
+  ],
+  "post_vote_status": "Bidding",
+  "cap_amount": "5000000000",
+  "bidding_trace": {
+    "bids": [
+      {
+        "ngo": "ngo-rapid.lifeline-demo.testnet",
+        "ask": "4600000000",
+        "eta_hours": 6,
+        "plan_hash": "ebdefe4b48fb32d6913ce09813ce6a64d193bd10aa03f491a07bab4c5d15f949",
+        "tx_hash": "sbx_1ae2be8a3b33856af6af2282e4889d036f50485d",
+        "simulated": true
+      },
+      {
+        "ngo": "ngo-balanced.lifeline-demo.testnet",
+        "ask": "4000000000",
+        "eta_hours": 14,
+        "plan_hash": "3ebd14a8adaafe223c39dc4d4f2cf7a6c4717fdf7c872a80da55acff66947a78",
+        "tx_hash": "sbx_d60f2c1178fada0eab1f27116d70127468205f6f",
+        "simulated": true
+      },
+      {
+        "ngo": "ngo-frugal.lifeline-demo.testnet",
+        "ask": "3400000000",
+        "eta_hours": 18,
+        "plan_hash": "4383508681ab118bbc289640690026cc92948775009cb3518482ac847659795d",
+        "tx_hash": "sbx_482e756d5ad2ad0b1211c85c8445deba42f05339",
+        "simulated": true
+      }
+    ],
+    "winner": "ngo-frugal.lifeline-demo.testnet",
+    "award_amount": "3400000000",
+    "tranche1_paid": "1360000000",
+    "close_bidding_tx_hash": "sbx_3a71a1fac3b6f9b3fd80437fba1a44d39767d40b"
+  },
+  "delivery_trace": {
+    "proof_hash": "73b9a41e1ab06e3fce01552f1b598091eaf477116971b2b5fae461407b1d7d3e",
+    "proof_uri": "/api/evidence/73b9a41e1ab06e3fce01552f1b598091eaf477116971b2b5fae461407b1d7d3e",
+    "proof_tx_hash": "sbx_d69e6a72d57fc01f4ea1e14c88a24bbbbd680208",
+    "votes": [
+      {
+        "role": "geo",
+        "signer_account": "v-geo.lifeline-demo.testnet",
+        "ok": false,
+        "reasoning": "Delivery proof rejected by deterministic checks: delivery GPS is 111858m from case centroid (>5000m max); claimed 50000 households is 8333% of planned 600 (outside 25%-300% plausibility band).",
+        "evidence_hash": "9dc3d98d2d31a30eb2b197c464debe306e81b62ca4c811a7808d76689304e669",
+        "tx_hash": "sbx_c2783854ef6fed9e32504270b3efd58426c0785a"
+      },
+      {
+        "role": "fact",
+        "signer_account": "v-fact.lifeline-demo.testnet",
+        "ok": false,
+        "reasoning": "Fraudulent delivery proof rejected: NGO claims 50,000 households reached (83.3x the awarded 600-household plan) and submitted GPS coordinates 86km away from the verified Maiduguri disaster zone.",
+        "evidence_hash": "0c7f76aa7f73ae319db734f7f1340bdbbbaed9a2dcf79cb8ba828620cf49c9c9",
+        "tx_hash": "sbx_00364fb337e8fee6f85bef44811f7f4a82d51b13"
+      },
+      {
+        "role": "sev",
+        "signer_account": "v-sev.lifeline-demo.testnet",
+        "ok": false,
+        "reasoning": "Fraudulent delivery proof rejected: NGO claims 50,000 households reached (83.3x the awarded 600-household plan) and submitted GPS coordinates 86km away from the verified Maiduguri disaster zone.",
+        "evidence_hash": "ab9c211086156faef454f33eafaeed17fef28d6232ed8f931d348e5a8a865d1f",
+        "tx_hash": "sbx_96767f160bf5e93f65fc2cb7e6f9a4aecf65b6a7"
+      },
+      {
+        "role": "red",
+        "signer_account": "v-red.lifeline-demo.testnet",
+        "ok": false,
+        "reasoning": "Fraudulent delivery proof rejected: NGO claims 50,000 households reached (83.3x the awarded 600-household plan) and submitted GPS coordinates 86km away from the verified Maiduguri disaster zone.",
+        "evidence_hash": "ad2b77e6ebabcc7728b3eb2c8e5f41f53928d6874be5fec4f1b8af2e91ff6e13",
+        "tx_hash": "sbx_c5d70ddacd63fa8c3e26100864ddced0adead4db"
+      }
+    ],
+    "tranche2_paid": "0"
+  },
+  "final_status": "Awarded",
+  "started_at": "2026-11-12T14:19:45.389Z",
+  "completed_at": "2026-11-12T14:19:45.396Z"
+}

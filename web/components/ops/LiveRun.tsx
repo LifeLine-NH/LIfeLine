@@ -5,7 +5,8 @@ import { ROLES, roleLabel } from "@/lib/format";
 import { RULES } from "@/lib/rules";
 import { type RunScript, SCENARIOS } from "@/lib/scenarios";
 import type { Verdict } from "@/lib/types";
-import { totalSteps, useRun } from "./useRun";
+import Link from "next/link";
+import { type RunInfo, totalSteps, useRun } from "./useRun";
 
 const VCLS: Record<Verdict, string> = { Yes: "verdict v-yes", No: "verdict v-no", Abstain: "verdict v-abs" };
 const VWORD: Record<Verdict, string> = { Yes: "Yes", No: "No", Abstain: "Abstained" };
@@ -30,8 +31,8 @@ function TxLinkSmall({ url, label = "Transaction" }: { url: string | null; label
   );
 }
 
-export function OpsConsole({ scripts, missing, sample }: { scripts: RunScript[]; missing: string[]; sample: boolean }) {
-  const { script, step, running, run } = useRun(scripts, 1200);
+export function OpsConsole({ scripts, missing, sample, chainLabel }: { scripts: RunScript[]; missing: string[]; sample: boolean; chainLabel: string }) {
+  const { script, step, running, pending, error, info, start, replay } = useRun(scripts, 1200);
 
   return (
     <>
@@ -51,57 +52,66 @@ export function OpsConsole({ scripts, missing, sample }: { scripts: RunScript[];
               <p className="body-s muted" style={{ flex: 1 }}>
                 {s.about}
               </p>
-              <button
-                type="button"
-                className={`btn btn-block ${current && has ? "btn-primary" : "btn-secondary"}`}
-                disabled={!has || running}
-                onClick={() => run(s.key)}
-                title={has ? undefined : "No recorded run for this scenario on the contract yet."}
-              >
-                {running && current ? "Replaying…" : has ? `Replay ${s.key}` : "No recorded run yet"}
+              <button type="button" className={`btn btn-block ${current ? "btn-primary" : "btn-secondary"}${running && current ? " btn-busy" : ""}`} disabled={running} onClick={() => start(s.key)}>
+                {running && current && <span className="spin" />}
+                {running && current ? (pending ? "Agents working…" : "Running…") : `Run ${s.key}`}
               </button>
+              {has && (
+                <button type="button" className="btn btn-ghost btn-sm" disabled={running} onClick={() => replay(s.key)}>
+                  Replay the recorded case
+                </button>
+              )}
             </article>
           );
         })}
       </section>
       <p className="cap">
-        {sample ? "Sample data. " : ""}A replay steps through the votes and events already recorded for the scenario&apos;s case. Starting a fresh run needs the agent runner, which isn&apos;t
-        connected to this site yet.{missing.length > 0 ? ` No recorded run found for ${missing.join(", ")}.` : ""}
+        Run sends the scenario&apos;s reports through the agent runner: four verifiers vote, the contract decides, simulated NGOs bid and deliver.{" "}
+        {sample ? "Sample data mode: the runner uses its own in memory chain, so nothing is written anywhere." : `Every step is a ${chainLabel} transaction.`}
+        {missing.length > 0 && !sample ? ` No recorded case yet for ${missing.join(", ")}.` : ""}
       </p>
+      {error && (
+        <div className="notice n-block" role="alert">
+          <span>
+            <b>The run didn&apos;t finish.</b> {error}
+          </span>
+        </div>
+      )}
 
-      {script && <Feed script={script} step={step} running={running} />}
+      {script && <Feed script={script} step={step} running={running} pending={pending} info={info} />}
     </>
   );
 }
 
-function Feed({ script, step, running }: { script: RunScript; step: number; running: boolean }) {
+function Feed({ script, step, running, pending, info }: { script: RunScript; step: number; running: boolean; pending: boolean; info: RunInfo | null }) {
   const total = totalSteps(script);
   const feed: React.ReactNode[] = [];
   const voteOf = (i: number) => script.votes.find((v) => v.role === ROLES[i]);
 
   if (step >= 0) {
     feed.push(
-      <FeedItem key="case" glyph={<span style={dot("#EFEEE8", "#15171C")}>C</span>} title="Case submitted" detail={`${script.key} · ${script.name} · ${script.caseId}`} />,
+      <FeedItem key="case" glyph={<span style={dot("#EFEEE8", "#15171C")}>C</span>} title={pending ? "Submitting the case" : "Case submitted"} detail={pending ? `${script.key} · ${script.name} · clustering reports` : `${script.key} · ${script.name} · ${script.caseId}`} />,
     );
   }
   if (step >= 1) {
     ROLES.forEach((role, i) => {
       const v = voteOf(i);
       const voted = !!v && step >= 2 + i;
+      const thinking = pending || (!!v && !voted);
       const name = roleLabel[role].name;
       feed.push(
         <FeedItem
           key={role}
           glyph={<span style={dot(role === "red" ? "#15171C" : "#EFEEE8", role === "red" ? "#fff" : "#15171C")}>{roleLabel[role].glyph}</span>}
-          title={voted ? `${name} voted` : v ? `${name} is thinking` : `${name} hasn't voted`}
-          detail={voted ? `${v!.reason ?? "Reasoning not in evidence storage."} ${v!.confidence}% confident.` : v ? "Checking the case…" : "No vote recorded for this verifier."}
+          title={voted ? `${name} voted` : thinking ? `${name} is thinking` : `${name} hasn't voted`}
+          detail={voted ? `${v!.reason ?? "Reasoning not in evidence storage."} ${v!.confidence}% confident.` : thinking ? "Checking the case…" : "No vote recorded for this verifier."}
           right={
             voted ? (
               <>
                 <span className={VCLS[v!.verdict]}>{VWORD[v!.verdict]}</span>
                 <TxLinkSmall url={v!.txUrl} />
               </>
-            ) : v ? (
+            ) : thinking ? (
               <span className="think" aria-label="Thinking">
                 <i style={{ background: "var(--accent)" }} />
                 <i style={{ background: "var(--accent)" }} />
@@ -148,13 +158,23 @@ function Feed({ script, step, running }: { script: RunScript; step: number; runn
       <div className="flex flex-wrap items-center justify-between gap-3" style={{ padding: "18px 24px", borderBottom: "1px solid var(--line)" }}>
         <div className="flex items-center gap-3">
           {running && <span className="live-dot" />}
-          <h2 className="h2">Run replay</h2>
+          <h2 className="h2">{info ? "Latest run" : "Run"}</h2>
           <span className="tag">
             {script.key} · {script.name}
           </span>
         </div>
-        <span className="cap num">
-          Step {Math.min(step + 1, total)} of {total}
+        <span className="cap num flex flex-wrap items-center gap-3">
+          {info && (
+            <span>
+              {info.mode === "live" ? "Live agents" : "Recorded model answers"} · {info.chainMode === "stub" ? "in memory chain" : `${info.chainMode} transactions`}
+            </span>
+          )}
+          {info?.onChain && info.caseId && (
+            <Link className="rec" href={`/cases/${encodeURIComponent(info.caseId)}`}>
+              Open the case file
+            </Link>
+          )}
+          <span>{pending ? "Waiting for the agents" : `Step ${Math.min(step + 1, total)} of ${total}`}</span>
         </span>
       </div>
       <div className="flex flex-wrap">

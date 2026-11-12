@@ -14,7 +14,7 @@ import { loadRunScripts } from "@/lib/runScript";
 async function Console() {
   const res = await attempt(() => loadRunScripts());
   if (!res.ok) return <SectionError what="the scenario runs" message={res.message} />;
-  return <OpsConsole scripts={res.value.scripts} missing={res.value.missing} sample={config.chainMode === "stub"} />;
+  return <OpsConsole scripts={res.value.scripts} missing={res.value.missing} sample={config.chainMode === "stub"} chainLabel={config.network} />;
 }
 
 async function ReviewQueue() {
@@ -67,7 +67,7 @@ export default function OpsPage() {
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div className="flex min-w-0 flex-col gap-2.5" style={{ flex: "1 1 520px" }}>
           <h1 className="h1">Ops console</h1>
-          <p className="lead">Replay a demo scenario and watch the four verifiers work, vote by vote, from what the contract recorded.</p>
+          <p className="lead">Run a demo scenario and watch the four verifiers work, vote by vote, through to the contract decision and payments.</p>
         </div>
         <Link className="btn btn-primary" href="/ops/stage">
           Open the large screen view

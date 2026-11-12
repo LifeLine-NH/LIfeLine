@@ -2,6 +2,7 @@ import { Countdown } from "@/components/ui/Countdown";
 import { HashCheck, HashCheckCompact } from "@/components/ui/HashCheck";
 import { AccountText, RecLink, SourceAmount } from "@/components/ui/links";
 import { ComingNextTag, SimulatedTag, ToneLabel, VerdictMark } from "@/components/ui/tags";
+import { type PaymentOption, PayoutQuote } from "./PayoutQuote";
 import { config } from "@/lib/config";
 import { formatAmount, formatShort, nanosToMs, percent, roleLabel, shortAccount, sourceTypeLabel } from "@/lib/format";
 import { RULES } from "@/lib/rules";
@@ -198,43 +199,42 @@ export function ProofSection({
   );
 }
 
-// Coming next: payout through NEAR Intents. No quote is shown until a real one can be fetched.
+// Payout in another asset through NEAR Intents: a live dry quote per payment. Executing it is coming next.
 export function PayoutPreview({ c, cfg }: { c: Case; cfg: ContractConfig }) {
   if (!c.winner || big(c.award_amount) === BigInt(0)) return null;
-  const first = big(c.tranche1_paid) > BigInt(0) ? c.tranche1_paid : ((big(c.award_amount) * BigInt(cfg.tranche1_bps)) / BigInt(10000)).toString();
+  const firstPaid = big(c.tranche1_paid) > BigInt(0);
+  const first = firstPaid ? big(c.tranche1_paid) : (big(c.award_amount) * BigInt(cfg.tranche1_bps)) / BigInt(10000);
+  const secondPaid = big(c.tranche2_paid) > BigInt(0);
+  const second = secondPaid ? big(c.tranche2_paid) : big(c.award_amount) - first;
+  const payments: PaymentOption[] = [
+    { key: "first", label: `First payment (${percent(cfg.tranche1_bps)}${firstPaid ? ", paid" : ""})`, short: firstPaid ? "First, paid" : "First", amount: first.toString(), display: formatAmount(first) },
+  ];
+  if (second > BigInt(0)) {
+    payments.push({ key: "second", label: `Second payment${secondPaid ? " (paid)" : " (after delivery check)"}`, short: secondPaid ? "Second, paid" : "Second, after check", amount: second.toString(), display: formatAmount(second) });
+  }
+  const notMainnet = config.chainMode !== "mainnet";
+
   return (
     <section className="wrap" style={{ paddingBottom: 56 }}>
-      <div className="card soon-card flex flex-wrap items-center gap-6" style={{ padding: "24px 28px" }}>
+      <div className="card flex flex-wrap items-start gap-6" style={{ padding: "24px 28px" }}>
         <div className="flex min-w-0 flex-col gap-2" style={{ flex: "1 1 300px" }}>
           <span className="flex flex-wrap items-center gap-2">
+            <span className="tag" style={{ background: "var(--st-delivered-tint)", color: "var(--st-delivered)" }}>
+              Live quote
+            </span>
             <ComingNextTag />
-            <span className="tag">Payout in another asset</span>
           </span>
           <h2 className="h3">Payout in the asset and chain the responder prefers</h2>
-          <p className="body-s muted">Through NEAR Intents. Not connected yet: waiting for the solver integration. Nothing here moves money.</p>
-        </div>
-        <div className="flex min-w-0 flex-wrap items-center gap-3.5" style={{ flex: "1.4 1 460px" }}>
-          <div className="panel" style={{ flex: "1 1 160px", background: "var(--surface)", border: "1px solid var(--line)" }}>
-            <span className="cap">First payment ({percent(cfg.tranche1_bps)})</span>
-            <p className="num" style={{ fontWeight: 700, fontSize: 20 }}>
-              {formatAmount(first)}
+          <p className="body-s muted">
+            NEAR Intents can deliver a payment as USDC on another chain. The quote is live from the 1Click API as a dry run, so nothing moves. Sending the payout this way is coming next.
+          </p>
+          {notMainnet && (
+            <p className="cap">
+              {config.chainMode === "stub" ? "This case is sample data" : "This pool pays a testnet token"}, and NEAR Intents has no testnet, so the quote prices the same amount of real USDC on NEAR mainnet.
             </p>
-            <span className="cap">on NEAR</span>
-          </div>
-          <span aria-hidden style={{ font: "600 20px/1 var(--font-body)", color: "var(--ink-3)" }}>
-            →
-          </span>
-          <div className="panel" style={{ flex: "1 1 200px", background: "var(--surface)", border: "1px dashed var(--line-2)" }}>
-            <span className="cap">{shortAccount(c.winner, 30)} would receive</span>
-            <p className="num" style={{ fontWeight: 700, fontSize: 20, color: "var(--ink-3)" }}>
-              No quote yet
-            </p>
-            <span className="cap">A live quote appears here once Intents is connected</span>
-          </div>
-          <button type="button" className="btn btn-secondary btn-sm" disabled>
-            Request payout
-          </button>
+          )}
         </div>
+        <PayoutQuote payments={payments} winner={shortAccount(c.winner, 28)} />
       </div>
     </section>
   );

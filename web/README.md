@@ -8,7 +8,7 @@ From the repo root:
 
 ```sh
 pnpm install
-pnpm --filter @lifeline/web dev
+pnpm dev
 ```
 
 Open http://localhost:3000. With no environment set, the app runs on sample data and says so in the header ("Sample data").
@@ -33,6 +33,29 @@ NEXT_PUBLIC_CHAIN_MODE=testnet
 NEXT_PUBLIC_CONTRACT_ID=<relief contract>
 NEXT_PUBLIC_POOL_TOKEN_ID=<test token>
 NEXT_PUBLIC_TEST_TOKEN_FAUCET=true
+```
+
+## Scenario runs (`/ops`)
+
+`/api/swarm/run` calls `executeSwarmScenario` from the agents package. The agents code finds its prompts, scenarios and recordings relative to its own files, so it runs unbundled from `agents/dist` (`serverExternalPackages` in `next.config.ts`). `pnpm dev` and `pnpm build` compile it first through `pnpm build:agents`, which also copies `agents/src/prompts` into `agents/dist/prompts`. If the prompts are missing, the verifiers fall back to Abstain, and the route refuses to show that run as a result.
+
+Runs use `NEXT_PUBLIC_CHAIN_MODE` and `NEXT_PUBLIC_DATA_MODE`: on `stub` the runner uses its own in memory chain, on `testnet` each step is a transaction signed with the keys in the agents' environment.
+
+## Payout quotes
+
+`/api/payout/quote` asks the NEAR Intents 1Click API for a dry run quote (`lib/intents/quote.ts`). No key is needed; `ONECLICK_API_KEY` removes the service fee. Intents runs on mainnet only.
+
+## Where things are
+
+```
+app/                pages and API routes
+components/layout   header, mode badges, wallet button, footer
+components/ui       buttons, tags, links to records, hash check, countdown
+components/case     quorum seal, vote card, timeline, bids, proof, evidence, payout quote
+components/home     hero replay, how the money moves, pool figures
+components/ops      scenario runner and the large screen view
+lib/                chain readers, formatting, case view rules, donate flow, intents, swarm traces
+app/lifeline.css    design tokens and component classes ("Quorum" design)
 ```
 
 ## Tests

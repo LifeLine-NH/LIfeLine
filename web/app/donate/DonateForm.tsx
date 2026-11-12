@@ -2,8 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { TxLink } from "@/components/Links";
-import { NotConnected } from "@/components/NotConnected";
 import { config } from "@/lib/config";
 import { confirmDonation, confirmPlainCall, pendingStore } from "@/lib/donate/confirm";
 import { describeError, describeReceiverError } from "@/lib/donate/messages";
@@ -19,6 +17,8 @@ import {
   loadToken,
   type TokenInfo,
 } from "@/lib/donate/plan";
+import { txUrl } from "@/lib/explorer";
+import { shortTx } from "@/lib/format";
 import type { TransferResult } from "@/lib/near/outcome";
 import { formatUnits, parseUnits } from "@/lib/near/units";
 import { useWallet } from "@/lib/wallet/WalletProvider";
@@ -33,6 +33,7 @@ const setup: DonateSetup = {
 };
 
 const FAUCET_AMOUNT = "100";
+const QUICK = ["10", "25", "50"];
 
 const errorText = (err: unknown) => (err instanceof Error ? err.message : String(err));
 
@@ -46,16 +47,44 @@ type Phase =
 
 type Loaded<T> = { state: "loading" } | { state: "ready"; value: T } | { state: "failed"; message: string };
 
+const netLabel = config.chainMode === "stub" ? `${config.tokenSymbol} on NEAR · sample` : `${config.tokenSymbol} on NEAR ${config.network}`;
+
 export function DonateForm() {
-  if (config.chainMode === "stub") {
-    return (
-      <NotConnected>
-        This site is showing sample data, so donations are off. Once it points at the relief contract on testnet, you
-        can connect a NEAR wallet and donate here.
-      </NotConnected>
-    );
-  }
-  return <LiveDonateForm />;
+  return (
+    <div className="card overflow-hidden" style={{ boxShadow: "var(--sh-2)" }}>
+      <div className="flex flex-wrap items-center justify-between gap-3" style={{ padding: "20px 28px", borderBottom: "1px solid var(--line)" }}>
+        <h2 className="h2">Donate</h2>
+        <span className="tag">{netLabel}</span>
+      </div>
+      {config.chainMode === "stub" ? (
+        <div className="card-p">
+          <OffForm notice={<p className="notice n-plain">This site is showing sample data, so donations are off.</p>} />
+        </div>
+      ) : (
+        <LiveDonateForm />
+      )}
+    </div>
+  );
+}
+
+function OffForm({ notice }: { notice: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-4.5">
+      {notice}
+      <div className="field" style={{ opacity: 0.7 }}>
+        <label className="label" htmlFor="amt-off">
+          Amount
+        </label>
+        <div className="input-wrap off">
+          <input id="amt-off" className="input" placeholder="0.00" disabled />
+          <span className="affix">{config.tokenSymbol}</span>
+        </div>
+      </div>
+      <button type="button" className="btn btn-lg btn-block" disabled>
+        Donate
+      </button>
+    </div>
+  );
 }
 
 function LiveDonateForm() {
@@ -66,7 +95,8 @@ function LiveDonateForm() {
   const [phase, setPhase] = useState<Phase>({ name: "editing" });
   const [env, setEnv] = useState<Loaded<{ token: TokenInfo; setupBlockers: Blocker[] }>>({ state: "loading" });
   const [donor, setDonor] = useState<Loaded<DonorState> | null>(null);
-  const [faucet, setFaucet] = useState<{ busy: boolean; message?: string }>({ busy: false });
+  const [faucet, setFaucet] = useState<{ busy: boolean; ok?: string; err?: string }>({ busy: false });
+  const [connecting, setConnecting] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -75,7 +105,7 @@ function LiveDonateForm() {
       try {
         token = await loadToken(setup);
       } catch (err) {
-        if (live) setEnv({ state: "failed", message: `Couldn't read the pool token ${setup.token}. ${errorText(err)}` });
+        if (live) setEnv({ state: "failed", message: `Couldn't read the pool token ${setup.token || "(not configured)"}. ${errorText(err)}` });
         return;
       }
       let setupBlockers: Blocker[];
@@ -146,6 +176,7 @@ function LiveDonateForm() {
   }, [token, donor, amountText]);
 
   const busy = phase.name === "checking" || phase.name === "signing" || phase.name === "confirming";
+  const finished = phase.name === "done" || phase.name === "error";
   const setupBlockers = env.state === "ready" ? env.value.setupBlockers : [];
 
   async function donate(e: React.FormEvent) {
@@ -184,127 +215,244 @@ function LiveDonateForm() {
       const hash = await wallet.signAndSend(tx);
       await confirmPlainCall(setup.rpc, hash, wallet.accountId);
       await refreshDonor(wallet.accountId);
-      setFaucet({ busy: false, message: `Added ${FAUCET_AMOUNT} test ${token.symbol} to your account.` });
+      setFaucet({ busy: false, ok: `${FAUCET_AMOUNT} test ${token.symbol} sent to your account.` });
     } catch (err) {
-      setFaucet({ busy: false, message: describeError(err) });
+      setFaucet({ busy: false, err: describeError(err) });
     }
   }
 
-  if (env.state === "loading") return <p className="text-muted">Reading the pool token…</p>;
-  if (env.state === "failed") return <p role="alert" className="text-stamp">{env.message}</p>;
-  const { symbol, decimals } = env.value.token;
+  const reset = () => {
+    setPhase({ name: "editing" });
+    setAmountText("");
+    setTouched(false);
+  };
 
-  const blockers = [...setupBlockers, ...(touched || amountText ? evaluation?.blockers ?? [] : [])];
+  if (env.state === "loading") {
+    return (
+      <div className="card-p flex flex-col gap-4" aria-busy="true">
+        <span className="skel block" style={{ height: 56 }} />
+        <span className="skel block" style={{ height: 56 }} />
+        <span className="cap">Reading the pool token and the relief contract…</span>
+      </div>
+    );
+  }
+  if (env.state === "failed") {
+    return (
+      <div className="card-p">
+        <OffForm
+          notice={
+            <div className="notice n-block" role="alert">
+              <span>
+                <b>Donations are paused.</b> {env.message}
+              </span>
+            </div>
+          }
+        />
+      </div>
+    );
+  }
+  if (setupBlockers.length > 0) {
+    return (
+      <div className="card-p">
+        <OffForm
+          notice={
+            <div className="notice n-block" role="alert">
+              <span>
+                <b>Donations are paused.</b> {setupBlockers.map((b) => b.message).join(" ")} Nothing you do here will send tokens.
+              </span>
+            </div>
+          }
+        />
+      </div>
+    );
+  }
+
+  const { symbol, decimals } = env.value.token;
+  const showFaucet = config.faucetEnabled && wallet.status === "connected" && donor?.state === "ready";
+
+  if (wallet.status !== "connected") {
+    return (
+      <div className="card-p flex flex-col items-start gap-4" style={{ paddingTop: 36, paddingBottom: 36 }}>
+        <div className="flex items-center gap-3.5">
+          <span className="avatar" style={{ width: 44, height: 44, background: "var(--sunken)", border: "2px dashed var(--line-2)" }} aria-hidden />
+          <div>
+            <p style={{ fontWeight: 650, fontSize: 17 }}>Connect a NEAR {config.network} wallet to donate</p>
+            <p className="body-s muted">You&apos;ll approve the exact amount in your wallet. Nothing is sent until you do.</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          className={`btn btn-primary btn-lg${connecting || wallet.status === "loading" ? " btn-busy" : ""}`}
+          disabled={connecting || wallet.status !== "disconnected"}
+          onClick={async () => {
+            setConnecting(true);
+            try {
+              await wallet.connect();
+            } catch {
+              // The wallet popup shows its own message; the button simply comes back.
+            } finally {
+              setConnecting(false);
+            }
+          }}
+        >
+          {(connecting || wallet.status === "loading") && <span className="spin" />}
+          {connecting ? "Opening wallet…" : wallet.status === "loading" ? "Loading wallets…" : wallet.status === "unavailable" ? "Wallet unavailable" : "Connect wallet"}
+        </button>
+        <p className="cap">Any NEAR Connect wallet works.{config.faucetEnabled ? ` Free test ${symbol} is available once you connect.` : ""}</p>
+      </div>
+    );
+  }
+
+  const fieldBlockers = (touched || amountText ? evaluation?.blockers ?? [] : []).filter((b) => b.code !== "setup");
+  // Problems with the account itself show even before an amount is typed.
+  const accountBlockers = (evaluation?.blockers ?? []).filter((b) => b.code === "network_mismatch" || b.code === "no_account" || b.code === "low_near");
+  const shown = fieldBlockers.length > 0 ? fieldBlockers : accountBlockers;
+  const firstError = shown[0]?.message;
+  const valid = evaluation && evaluation.blockers.length === 0 && evaluation.amount !== null;
+  const locked = busy || finished;
+  const maxBalance = donor?.state === "ready" ? formatUnits(donor.value.tokenBalance, decimals) : null;
 
   return (
-    <div className="max-w-md space-y-5">
-      {setupBlockers.length > 0 && (
-        <ul className="space-y-2" role="alert">
-          {setupBlockers.map((b) => (
-            <li key={b.message} className="rounded border border-stamp/40 bg-stamp/10 px-3 py-2 text-sm">
-              {b.message}
-            </li>
-          ))}
-        </ul>
-      )}
+    <>
+      <form onSubmit={donate} className="card-p flex flex-col gap-5" noValidate>
+        <DonorSummary donor={donor} symbol={symbol} decimals={decimals} />
 
-      {wallet.status !== "connected" ? (
-        <div className="space-y-3">
-          <p>Connect a NEAR {config.network} wallet to donate.</p>
-          <button
-            type="button"
-            onClick={() => wallet.connect().catch(() => undefined)}
-            disabled={wallet.status !== "disconnected"}
-            className="rounded bg-tarp px-5 py-2.5 font-semibold text-white hover:bg-tarp-deep disabled:opacity-50"
-          >
-            {wallet.status === "loading" ? "Loading wallets…" : "Connect wallet"}
-          </button>
-        </div>
-      ) : (
-        <form onSubmit={donate} className="space-y-4" noValidate>
-          <DonorSummary donor={donor} symbol={symbol} decimals={decimals} />
-
-          <div>
-            <label htmlFor="amount" className="block font-semibold">
-              Amount in {symbol}
-            </label>
+        <div className="field">
+          <label className="label" htmlFor="amount">
+            Amount
+          </label>
+          <div className={`input-wrap${firstError ? " bad" : ""}${locked ? " off" : ""}`}>
             <input
               id="amount"
               name="amount"
+              className="input"
               type="text"
               inputMode="decimal"
               autoComplete="off"
-              placeholder="50"
+              placeholder="0.00"
               value={amountText}
               onChange={(e) => setAmountText(e.target.value)}
               onBlur={() => setTouched(true)}
-              disabled={busy}
-              aria-invalid={blockers.length > 0}
-              aria-describedby="amount-help"
-              className="mt-1 w-full rounded border border-line bg-paper px-3 py-2 text-lg"
+              disabled={locked}
+              aria-invalid={!!firstError}
+              aria-describedby="amount-msg"
             />
+            <span className="affix">{symbol}</span>
           </div>
-
-          <div id="amount-help" aria-live="polite">
-            {blockers.filter((b) => b.code !== "setup").map((b) => (
-              <p key={b.code} className="text-sm text-stamp">
-                {b.message}
-              </p>
-            ))}
-          </div>
-
-          <button
-            type="submit"
-            disabled={busy || setupBlockers.length > 0 || donor?.state !== "ready"}
-            className="rounded bg-tarp px-5 py-2.5 font-semibold text-white hover:bg-tarp-deep disabled:opacity-50"
-          >
-            {phase.name === "checking"
-              ? "Checking…"
-              : phase.name === "signing"
-                ? "Waiting for your wallet…"
-                : phase.name === "confirming"
-                  ? "Confirming…"
-                  : evaluation?.amount
-                    ? `Donate ${formatUnits(evaluation.amount, decimals)} ${symbol}`
-                    : "Donate"}
-          </button>
-
-          {config.faucetEnabled && (
-            <div className="border-t border-line pt-4 text-sm">
-              <button
-                type="button"
-                onClick={getTestTokens}
-                disabled={faucet.busy || busy || donor?.state !== "ready"}
-                className="rounded border border-tarp px-3 py-1.5 font-semibold text-tarp hover:bg-tarp hover:text-white disabled:opacity-50"
-              >
-                {faucet.busy ? "Minting…" : `Get ${FAUCET_AMOUNT} test ${symbol}`}
+          <div className="chips" aria-label="Quick amounts">
+            {QUICK.map((q) => (
+              <button key={q} type="button" className="chip-btn" disabled={locked} onClick={() => (setAmountText(q), setTouched(true))}>
+                {q}
               </button>
-              <p className="mt-1 text-muted">Testnet only. These tokens have no value.</p>
-              {faucet.message && <p className="mt-1">{faucet.message}</p>}
-            </div>
-          )}
-        </form>
-      )}
+            ))}
+            {maxBalance && maxBalance !== "0" && (
+              <button type="button" className="chip-btn" disabled={locked} onClick={() => (setAmountText(maxBalance), setTouched(true))}>
+                Max {maxBalance}
+              </button>
+            )}
+          </div>
+          <div id="amount-msg" aria-live="polite">
+            {firstError ? <p className="err">{firstError}</p> : <p className="help">Up to {decimals} decimal places. The network fee is paid in NEAR.</p>}
+          </div>
+        </div>
 
-      <PhasePanel phase={phase} symbol={symbol} decimals={decimals} onReset={() => setPhase({ name: "editing" })} />
-    </div>
+        <button type="submit" className={`btn btn-primary btn-lg btn-block${busy ? " btn-busy" : ""}`} disabled={busy || finished || !valid} aria-busy={busy}>
+          {busy && <span className="spin" />}
+          {phase.name === "checking"
+            ? "Checking…"
+            : phase.name === "signing"
+              ? "Waiting for your wallet…"
+              : phase.name === "confirming"
+                ? "Confirming…"
+                : valid && evaluation?.amount
+                  ? `Donate ${formatUnits(evaluation.amount, decimals)} ${symbol}`
+                  : "Donate"}
+        </button>
+
+        <PhasePanel phase={phase} symbol={symbol} decimals={decimals} onReset={reset} />
+      </form>
+
+      {showFaucet && (
+        <div className="flex flex-wrap items-center justify-between gap-3.5" style={{ padding: "18px 28px", borderTop: "1px dashed var(--line-2)", background: "#FBFAF7" }}>
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span style={{ fontWeight: 600, fontSize: 14.5 }}>Need test tokens?</span>
+            <span className="cap">Testnet only. These tokens have no value.</span>
+            <span aria-live="polite">
+              {faucet.ok && (
+                <span className="body-s" style={{ color: "var(--st-delivered)", fontWeight: 550 }}>
+                  {faucet.ok}
+                </span>
+              )}
+              {faucet.err && <span className="err">{faucet.err}</span>}
+            </span>
+          </div>
+          <button type="button" className="btn btn-secondary btn-sm" onClick={getTestTokens} disabled={faucet.busy || busy} aria-busy={faucet.busy}>
+            {faucet.busy && <span className="spin" />}
+            {faucet.busy ? "Sending…" : faucet.err ? "Try again" : `Get ${FAUCET_AMOUNT} test ${symbol}`}
+          </button>
+        </div>
+      )}
+    </>
   );
 }
 
 function DonorSummary({ donor, symbol, decimals }: { donor: Loaded<DonorState> | null; symbol: string; decimals: number }) {
-  if (!donor || donor.state === "loading") return <p className="text-sm text-muted">Reading your balances…</p>;
-  if (donor.state === "failed") return <p className="text-sm text-stamp">{donor.message}</p>;
+  if (!donor || donor.state === "loading") {
+    return (
+      <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(180px, 100%), 1fr))" }} aria-busy="true">
+        <span className="skel block" style={{ height: 56 }} />
+        <span className="skel block" style={{ height: 56 }} />
+      </div>
+    );
+  }
+  if (donor.state === "failed") return <p className="err">{donor.message}</p>;
   return (
-    <dl className="flex flex-wrap gap-x-8 gap-y-1 text-sm">
-      <div>
-        <dt className="text-muted">Your {symbol}</dt>
-        <dd className="font-semibold">{formatUnits(donor.value.tokenBalance, decimals)}</dd>
+    <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(180px, 100%), 1fr))" }}>
+      <div className="panel flex items-baseline justify-between gap-2">
+        <span className="body-s muted">Your {symbol}</span>
+        <span className="num" style={{ fontWeight: 700, fontSize: 18 }}>
+          {formatUnits(donor.value.tokenBalance, decimals)}
+        </span>
       </div>
-      <div>
-        <dt className="text-muted">NEAR for fees</dt>
-        <dd className="font-semibold">{formatUnits(donor.value.nearAvailable, 24, 4)}</dd>
+      <div className="panel flex items-baseline justify-between gap-2">
+        <span className="body-s muted">NEAR for fees</span>
+        <span className="num" style={{ fontWeight: 700, fontSize: 18 }}>
+          {formatUnits(donor.value.nearAvailable, 24, 4)}
+        </span>
       </div>
-    </dl>
+    </div>
+  );
+}
+
+function TxRow({ hash, onReset, again = true }: { hash?: string; onReset: () => void; again?: boolean }) {
+  const url = txUrl(hash);
+  return (
+    <span className="mt-1 flex flex-wrap items-center gap-3.5">
+      {url && hash && (
+        <a className="rec" href={url} target="_blank" rel="noreferrer">
+          Transaction{" "}
+          <span className="mono" style={{ fontSize: 12 }}>
+            {shortTx(hash)}
+          </span>
+        </a>
+      )}
+      {again && (
+        <button type="button" className="btn btn-secondary btn-sm" onClick={onReset}>
+          Donate again
+        </button>
+      )}
+    </span>
+  );
+}
+
+function Panel({ tone, title, children }: { tone: "info" | "ok" | "warn" | "block" | "plain"; title: string; children: React.ReactNode }) {
+  return (
+    <div className={`notice n-${tone}`} role="status" aria-live="polite">
+      <div className="flex min-w-0 flex-col gap-2">
+        <b>{title}</b>
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -312,22 +460,26 @@ function PhasePanel({ phase, symbol, decimals, onReset }: { phase: Phase; symbol
   const fmt = (v: bigint) => `${formatUnits(v, decimals)} ${symbol}`;
 
   if (phase.name === "signing") {
-    return <Panel tone="info" title="Check your wallet">Approve the donation of {fmt(phase.amount)} in your wallet.</Panel>;
+    return (
+      <Panel tone="info" title="Check your wallet.">
+        <span>Approve the donation of {fmt(phase.amount)} in your wallet.</span>
+      </Panel>
+    );
   }
   if (phase.name === "confirming") {
     return (
-      <Panel tone="info" title="Sent. Waiting for the network">
-        <p>This usually takes a few seconds.</p>
-        <TxLink hash={phase.hash} />
+      <Panel tone="info" title="Sent. Waiting for the network.">
+        <span>This usually takes a few seconds.</span>
+        <TxRow hash={phase.hash} onReset={onReset} again={false} />
       </Panel>
     );
   }
   if (phase.name === "error") {
+    const cancelled = phase.message.startsWith("You cancelled");
     return (
-      <Panel tone="bad" title="Not donated">
-        <p>{phase.message}</p>
-        {phase.hash && <TxLink hash={phase.hash} />}
-        <ResetButton onReset={onReset} />
+      <Panel tone={cancelled ? "plain" : "block"} title={cancelled ? "You cancelled in your wallet." : "Not donated."}>
+        <span>{cancelled ? "Nothing was sent." : phase.message}</span>
+        <TxRow hash={phase.hash} onReset={onReset} />
       </Panel>
     );
   }
@@ -336,65 +488,44 @@ function PhasePanel({ phase, symbol, decimals, onReset }: { phase: Phase; symbol
   const r = phase.result;
   if (r.kind === "mismatch") {
     return (
-      <Panel tone="bad" title="This isn't the transaction we prepared">
-        <p>{r.detail}. Check your wallet history before trying again.</p>
-        <TxLink hash={phase.hash} />
+      <Panel tone="block" title="This isn't the transaction we prepared.">
+        <span>{r.detail}. We stopped as a safety check. Check your wallet&apos;s activity before trying again.</span>
+        <TxRow hash={phase.hash} onReset={onReset} />
       </Panel>
     );
   }
   if (r.kind === "failed") {
     return (
-      <Panel tone="bad" title="The transfer failed">
-        <p>{describeError(r.reason)} Your tokens didn&apos;t move.</p>
-        <TxLink hash={phase.hash} />
-        <ResetButton onReset={onReset} />
+      <Panel tone="block" title="The transfer failed.">
+        <span>Your tokens didn&apos;t move. {describeError(r.reason)}</span>
+        <TxRow hash={phase.hash} onReset={onReset} />
       </Panel>
     );
   }
   if (r.kind === "refunded") {
     return (
-      <Panel tone="bad" title="Nothing was donated">
-        <p>The relief contract sent all {fmt(r.refunded)} back to you.</p>
-        {r.receiverError && <p>{describeReceiverError(r.receiverError)}</p>}
-        <TxLink hash={phase.hash} />
-        <ResetButton onReset={onReset} />
+      <Panel tone="warn" title="Nothing was donated.">
+        <span>The relief contract sent all {fmt(r.refunded)} back to you.</span>
+        {r.receiverError && <span className="body-s muted">Reason: {describeReceiverError(r.receiverError)}</span>}
+        <TxRow hash={phase.hash} onReset={onReset} />
       </Panel>
     );
   }
   if (r.kind === "partial") {
     return (
-      <Panel tone="info" title="Part of it was donated">
-        <p>
+      <Panel tone="warn" title="Partly donated.">
+        <span>
           The relief contract kept {fmt(r.used)} and refunded {fmt(r.refunded)} to you.
-        </p>
-        {r.receiverError && <p>{describeReceiverError(r.receiverError)}</p>}
-        <TxLink hash={phase.hash} />
+        </span>
+        {r.receiverError && <span className="body-s muted">Reason: {describeReceiverError(r.receiverError)}</span>}
+        <TxRow hash={phase.hash} onReset={onReset} />
       </Panel>
     );
   }
   return (
-    <Panel tone="good" title="Donation received">
-      <p>{fmt(r.used)} is now in the relief pool. Thank you.</p>
-      <TxLink hash={phase.hash} />
-      <ResetButton onReset={onReset} label="Donate again" />
+    <Panel tone="ok" title="Donation received.">
+      <span>{fmt(r.used)} is now in the relief pool. Thank you.</span>
+      <TxRow hash={phase.hash} onReset={onReset} />
     </Panel>
-  );
-}
-
-function Panel({ tone, title, children }: { tone: "good" | "bad" | "info"; title: string; children: React.ReactNode }) {
-  const border = tone === "good" ? "border-verified" : tone === "bad" ? "border-stamp" : "border-tarp";
-  return (
-    <section role="status" aria-live="polite" className={`space-y-2 rounded-md border-l-4 ${border} bg-paper p-4 text-sm`}>
-      <h3 className="font-display text-xl font-bold">{title}</h3>
-      {children}
-    </section>
-  );
-}
-
-function ResetButton({ onReset, label = "Try again" }: { onReset: () => void; label?: string }) {
-  return (
-    <button type="button" onClick={onReset} className="font-semibold text-tarp underline underline-offset-4">
-      {label}
-    </button>
   );
 }

@@ -417,6 +417,69 @@ export const CASES: StubCaseSeed[] = [
   },
 ];
 
+CASES.push({
+  case: {
+    ...emptyCase,
+    id: "s4r9v-2026-11-10-008",
+    geohash: "s4r9v",
+    requested_tier: 2,
+    tier: 2,
+    status: "Awarded",
+    opened_at: ns("2026-11-10T11:30:00Z"),
+    cap: usdc(2000),
+    bidding_ends_at: ns("2026-11-10T11:33:00Z"),
+    winner: ACCOUNTS.rapid,
+    award_amount: usdc(1450),
+    tranche1_paid: usdc(580),
+    proof_deadline: ns("2026-11-10T11:38:00Z"),
+  },
+  bundle: {
+    case_id: "s4r9v-2026-11-10-008",
+    geohash: "s4r9v",
+    centroid: { lat: 9.51, lon: 12.19 },
+    radius_m: 450,
+    window: { from: "2026-11-10T09:10:00Z", to: "2026-11-10T11:05:00Z" },
+    incident_type: "flood",
+    requested_tier: 2,
+    reports: reports(
+      [
+        "River rose overnight on the east bank, about 600 households affected.",
+        "Houses near the river flooded, families moved to the primary school.",
+        "Water in the east bank market, stalls under water.",
+      ],
+      "2026-11-10T09:12:00Z",
+      3,
+    ),
+    source_diversity: 3,
+    external_evidence: [
+      evidence("open-meteo", "Sample: heavy rain over the window", "yes", 16),
+      evidence("gdacs", "Sample: flood alert covers the river basin", "yes", 17),
+    ],
+    mode: "replay",
+  },
+  votes: [
+    { role: "geo", verdict: "Yes", confidence_bps: 8500, reasoning: "Three separate sources over two hours.", at: "2026-11-10T11:30:41Z" },
+    { role: "fact", verdict: "Yes", confidence_bps: 8200, reasoning: "Rain data and an alert support a flood here.", at: "2026-11-10T11:30:58Z" },
+    { role: "sev", verdict: "Yes", confidence_bps: 7700, tier: 2, reasoning: "About 600 households affected. Tier 2.", at: "2026-11-10T11:31:04Z" },
+    { role: "red", verdict: "Yes", confidence_bps: 7100, reasoning: "Rebutted: outside data agrees with the reports.", objection: "Household count could be inflated.", at: "2026-11-10T11:31:12Z" },
+  ],
+  bids: [{ ngo: ACCOUNTS.rapid, ask: usdc(1450), eta_hours: 10, plan_hash: "f1".repeat(32), at: ns("2026-11-10T11:31:40Z"), simulated: true }],
+  delivery: [
+    { role: "geo", ok: true, reasoning: "Delivery location matches the case area.", at: "2026-11-10T11:36:20Z" },
+    { role: "fact", ok: false, reasoning: "50,000 households claimed against a plan of 600 and reports of about 600 affected.", at: "2026-11-10T11:36:31Z" },
+    { role: "sev", ok: false, reasoning: "The claimed reach is about 80 times the size of the event.", at: "2026-11-10T11:36:35Z" },
+    { role: "red", ok: false, reasoning: "Inflated proof: the numbers can't be true for an area this size.", at: "2026-11-10T11:36:42Z" },
+  ],
+});
+
+// Which stub case stands in for each agent scenario. On testnet the runner's case ids end in -s1, -s2 …
+export const STUB_SCENARIO_CASES: Record<string, string> = {
+  S1: "s4p7k-2026-11-09-001",
+  S2: "s4m1x-2026-11-10-004",
+  S3: "s4k5r-2026-11-10-005",
+  S5: "s4r9v-2026-11-10-008",
+};
+
 export const NGOS: Record<string, Ngo & { name: string }> = {
   [ACCOUNTS.rapid]: { name: "Rapid response (simulated)", bond: usdc(500), reputation: 120, delivered: 3, failed: 0, profile_hash: "b1".repeat(32) },
   [ACCOUNTS.balanced]: { name: "Balanced relief (simulated)", bond: usdc(500), reputation: 110, delivered: 2, failed: 0, profile_hash: "b2".repeat(32) },
@@ -474,6 +537,19 @@ export const PROOFS: Record<string, Record<string, unknown>> = {
     location: { lat: 9.414, lon: 12.341 },
     photo_hashes: ["1".repeat(64)],
     delivered_at: "2026-11-09T06:16:00Z",
+    simulated: true,
+  },
+  "s4r9v-2026-11-10-008": {
+    case_id: "s4r9v-2026-11-10-008",
+    ngo_account: ACCOUNTS.rapid,
+    summary: "Sample: food and water kits delivered across the east bank.",
+    households_reached: 50000,
+    planned_households: 600,
+    amount_spent: usdc(1450),
+    award_amount: usdc(1450),
+    location: { lat: 9.511, lon: 12.191 },
+    photo_hashes: ["3".repeat(64)],
+    delivered_at: "2026-11-10T11:36:00Z",
     simulated: true,
   },
   "s4n8d-2026-11-10-003": {

@@ -1,60 +1,102 @@
+import Link from "next/link";
 import { Suspense } from "react";
-import { CaseTable } from "@/components/CaseTable";
-import { NotConnected } from "@/components/NotConnected";
+import { OpsConsole } from "@/components/ops/LiveRun";
+import { SectionError } from "@/components/ui/PageError";
+import { ComingNextTag, Skel } from "@/components/ui/tags";
+import { attempt } from "@/lib/attempt";
+import { listCaseRows } from "@/lib/caseList";
+import { tally } from "@/lib/caseView";
 import { chain } from "@/lib/chain";
+import { config } from "@/lib/config";
+import { incidentLabel } from "@/lib/format";
+import { loadRunScripts } from "@/lib/runScript";
 
-// Scenario ids match agents/scenarios. Expected outcomes come from those files.
-const SCENARIOS = [
-  { id: "S1", name: "Genuine report", expect: "Verified, funded and delivered" },
-  { id: "S2", name: "Keyword attack", expect: "Rejected: reports repeat \"flood\" with no outside evidence" },
-  { id: "S3", name: "Flood of fakes", expect: "Rejected: many reports from one sender" },
-  { id: "S5", name: "Inflated proof", expect: "Second payment withheld: the delivery claim doesn't add up" },
-];
+async function Console() {
+  const res = await attempt(() => loadRunScripts());
+  if (!res.ok) return <SectionError what="the scenario runs" message={res.message} />;
+  return <OpsConsole scripts={res.value.scripts} missing={res.value.missing} sample={config.chainMode === "stub"} />;
+}
 
 async function ReviewQueue() {
-  const cases = await chain.listCases({ status: "NeedsReview", limit: 20 });
-  return <CaseTable cases={cases} />;
+  const res = await attempt(async () => {
+    const rows = (await listCaseRows(200)).filter((r) => r.c.status === "NeedsReview");
+    const votes = await Promise.all(rows.map((r) => chain.getVotes(r.c.id)));
+    return rows.map((r, i) => ({ ...r, t: tally(votes[i]) }));
+  });
+  if (!res.ok) return <SectionError what="the review queue" message={res.message} />;
+  if (res.value.length === 0) {
+    return (
+      <div className="card" style={{ padding: 32, textAlign: "center", borderStyle: "dashed", boxShadow: "none", background: "transparent" }}>
+        <p className="muted">No cases are waiting for a coordinator.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="card rows">
+      {res.value.map(({ c, incident, t }) => (
+        <div key={c.id} className="row-item queue-row" style={{ gap: 16 }}>
+          <span className="flex min-w-0 flex-col gap-0.5">
+            <Link href={`/cases/${encodeURIComponent(c.id)}`} style={{ fontWeight: 650, color: "var(--ink)" }}>
+              {incident ? incidentLabel[incident] : "Incident"}
+              {c.tier > 0 ? ` · tier ${c.tier}` : ""}
+            </Link>
+            <span className="mono truncate" style={{ fontSize: 12.5, color: "var(--ink-3)" }}>
+              {c.id}
+            </span>
+          </span>
+          <span className="body-s muted">
+            {t.yes} yes · {t.no} no · {t.abs} abstained. Neither rule was met.
+          </span>
+          <span className="flex flex-wrap gap-2">
+            <button type="button" className="btn btn-secondary btn-sm" disabled>
+              Confirm
+            </button>
+            <button type="button" className="btn btn-secondary btn-sm" disabled>
+              Reject
+            </button>
+          </span>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export default function OpsPage() {
   return (
-    <div className="space-y-10">
-      <div>
-        <h1 className="font-display text-5xl font-extrabold">Ops console</h1>
-        <p className="mt-3 max-w-[65ch] text-muted">
-          Run a scenario through the verifier swarm and watch each agent vote on chain.
-        </p>
+    <div className="wrap section flex flex-col gap-8">
+      <div className="flex flex-wrap items-end justify-between gap-5">
+        <div className="flex min-w-0 flex-col gap-2.5" style={{ flex: "1 1 520px" }}>
+          <h1 className="h1">Ops console</h1>
+          <p className="lead">Replay a demo scenario and watch the four verifiers work, vote by vote, from what the contract recorded.</p>
+        </div>
+        <Link className="btn btn-primary" href="/ops/stage">
+          Open the large screen view
+        </Link>
       </div>
 
-      <NotConnected>
-        Scenario runs go through the agent runner at /api/swarm/run, which isn&apos;t connected yet.
-      </NotConnected>
+      <Suspense
+        fallback={
+          <div className="flex flex-col gap-4">
+            <Skel h={220} r={20} />
+            <Skel h={420} r={20} />
+          </div>
+        }
+      >
+        <Console />
+      </Suspense>
 
-      <section>
-        <h2 className="font-display text-3xl font-bold">Scenarios</h2>
-        <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-          {SCENARIOS.map((s) => (
-            <li key={s.id} className="flex flex-col justify-between rounded-md border border-line bg-paper p-5">
-              <div>
-                <p className="font-display text-xl font-bold">
-                  {s.id}: {s.name}
-                </p>
-                <p className="mt-1 text-sm text-muted">Expected: {s.expect}</p>
-              </div>
-              <button type="button" disabled className="mt-4 self-start rounded bg-tarp px-4 py-2 font-semibold text-white disabled:opacity-50">
-                Run {s.id}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section>
-        <h2 className="font-display text-3xl font-bold">Waiting for a coordinator</h2>
-        <p className="mt-1 mb-4 text-sm text-muted">Cases where the verifiers split. A person has to confirm or reject them.</p>
-        <Suspense fallback={<p className="text-muted">Reading cases…</p>}>
+      <section className="flex flex-col gap-3.5">
+        <div className="sec-head" style={{ margin: 0 }}>
+          <div className="flex flex-col gap-1.5">
+            <h2 className="h2">Waiting for a coordinator</h2>
+            <p className="muted">Cases where neither rule was met.</p>
+          </div>
+          <ComingNextTag />
+        </div>
+        <Suspense fallback={<Skel h={90} r={20} />}>
           <ReviewQueue />
         </Suspense>
+        <p className="cap">Confirm and Reject need the coordinator role on the live contract. Each decision will be its own transaction.</p>
       </section>
     </div>
   );

@@ -21,3 +21,6 @@ pnpm-debug.log*
 coverage/
 agents/storage/
 
+
+# Design handoff archive (kept out of git)
+lifeline-design-handoff.zip

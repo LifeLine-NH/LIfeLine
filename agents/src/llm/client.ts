@@ -1,10 +1,12 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import dotenv from "dotenv";
 import { z, type ZodSchema } from "zod";
 import type { ExecutionMode, Verdict } from "../schemas/index.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 const RECORDINGS_ROOT = path.resolve(__dirname, "../../recordings");
 
 export type LlmAgentRole = "fact" | "sev" | "red" | "delivery";
@@ -36,17 +38,25 @@ export function getModelConfigForRole(role: LlmAgentRole): LlmModelConfig {
         provider: "near-ai-cloud",
         baseUrl: primaryBaseUrl,
         apiKey: primaryApiKey,
-        modelId: process.env.FACT_MODEL_ID ?? "llama-3.3-70b-versatile"
+        modelId: process.env.FACT_MODEL_ID ?? "openai/gpt-oss-120b"
       };
     case "sev":
       return {
         provider: "near-ai-cloud",
         baseUrl: primaryBaseUrl,
         apiKey: primaryApiKey,
-        modelId: process.env.SEV_MODEL_ID ?? "qwen-qwq-32b"
+        modelId: process.env.SEV_MODEL_ID ?? "qwen/qwen3.8-27b"
       };
     case "red":
     case "delivery":
+      if (!secondaryApiKey && primaryApiKey) {
+        return {
+          provider: "secondary",
+          baseUrl: primaryBaseUrl,
+          apiKey: primaryApiKey,
+          modelId: process.env.RED_MODEL_ID ?? "openai/gpt-oss-20b"
+        };
+      }
       return {
         provider: "secondary",
         baseUrl: secondaryBaseUrl,

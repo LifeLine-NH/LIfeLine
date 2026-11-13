@@ -1,14 +1,18 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { BidClock, BidNote } from "@/components/ui/BidClock";
+import { BidForm } from "@/components/ngo/BidForm";
+import { type AwardRow, NgoAccount } from "@/components/ngo/NgoAccount";
+import { NgoProvider } from "@/components/ngo/NgoProvider";
+import { BidClock } from "@/components/ui/BidClock";
 import { AccountText, contractUrl, SourceAmount } from "@/components/ui/links";
 import { SectionError } from "@/components/ui/PageError";
-import { ComingNextTag, SimulatedTag, Skel } from "@/components/ui/tags";
+import { SimulatedTag, Skel } from "@/components/ui/tags";
 import { attempt } from "@/lib/attempt";
 import { chain } from "@/lib/chain";
 import { getEvidence } from "@/lib/evidence";
 import { formatAmount, incidentLabel, nanosToMs, percent } from "@/lib/format";
 import { RULES } from "@/lib/rules";
+import { config } from "@/lib/config";
 import type { EvidenceBundle } from "@/lib/types";
 
 async function OpenForBids() {
@@ -68,17 +72,25 @@ async function OpenForBids() {
               </div>
               <BidClock endsAtMs={ends} />
             </div>
-            <div className="mt-auto flex flex-wrap items-center justify-between gap-3" style={{ padding: "16px 22px", background: "#FBFAF7", borderTop: "1px solid var(--line)" }}>
-              <BidNote endsAtMs={ends} />
-              <button type="button" className="btn btn-primary btn-sm" disabled>
-                Place a bid
-              </button>
+            <div className="mt-auto" style={{ padding: "16px 22px", background: "#FBFAF7", borderTop: "1px solid var(--line)" }}>
+              <BidForm caseId={c.id} cap={c.cap} firstBps={cfg.tranche1_bps} endsAtMs={ends} />
             </div>
           </article>
         );
       })}
     </div>
   );
+}
+
+async function Account() {
+  const res = await attempt(async () => {
+    const lists = await Promise.all((["Awarded", "ProofSubmitted", "Delivered"] as const).map((status) => chain.listCases({ status, limit: 100 })));
+    return lists.flat().filter((c) => c.winner);
+  });
+  const awards: AwardRow[] = res.ok
+    ? res.value.map((c) => ({ id: c.id, status: c.status, winner: c.winner!, award: c.award_amount, first: c.tranche1_paid, second: c.tranche2_paid }))
+    : [];
+  return <NgoAccount awards={awards} />;
 }
 
 async function HowItWorks() {
@@ -152,6 +164,7 @@ async function DemoBidders() {
 
 export default function NgoPage() {
   return (
+    <NgoProvider>
     <div className="wrap section flex flex-col gap-8">
       <div className="flex min-w-0 flex-col gap-2.5" style={{ maxWidth: 900 }}>
         <h1 className="h1">For responders</h1>
@@ -161,12 +174,24 @@ export default function NgoPage() {
         </p>
       </div>
 
-      <div className="notice n-warn">
-        <span>
-          <b>Bidding from this page isn&apos;t connected yet.</b> Registering, bidding and submitting proof need a NEAR wallet and the live relief contract. In this demo, simulated NGO bots
-          place the bids you see on case pages.
-        </span>
-      </div>
+      {config.chainMode === "stub" ? (
+        <div className="notice n-warn">
+          <span>
+            <b>This page is showing sample data.</b> Registering, bidding and submitting proof work from here once the site points at the live relief contract. In this demo, simulated NGO
+            bots place the bids you see on case pages.
+          </span>
+        </div>
+      ) : (
+        <div className="notice n-info">
+          <span>
+            <b>Bids, awards and payments are real {config.network} transactions.</b> Simulated NGO bots also bid in the demo, and are labelled wherever they appear.
+          </span>
+        </div>
+      )}
+
+      <Suspense fallback={<Skel h={120} r={20} />}>
+        <Account />
+      </Suspense>
 
       <section className="flex flex-col gap-4">
         <div className="sec-head" style={{ margin: 0 }}>
@@ -192,15 +217,7 @@ export default function NgoPage() {
         </Suspense>
       </section>
 
-      <section className="card flex flex-wrap items-center justify-between gap-4" style={{ padding: "24px 28px", borderStyle: "dashed", boxShadow: "none" }}>
-        <div className="flex flex-col gap-1.5">
-          <span className="flex flex-wrap items-center gap-2">
-            <ComingNextTag />
-            <span style={{ fontWeight: 650 }}>Register, bid, my awards and proof forms</span>
-          </span>
-          <span className="body-s muted">Designed and waiting on the live contract&apos;s registration, bid and proof methods.</span>
-        </div>
-      </section>
     </div>
+    </NgoProvider>
   );
 }

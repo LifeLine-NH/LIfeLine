@@ -11,8 +11,9 @@ Built at NEAR HACKATHON 2026 for the **AI Swarms** and **Open Innovation** track
 | Part | State |
 |---|---|
 | Verifier swarm, intake, simulated NGO bidders (`agents/`) | Working. Runs all four demo scenarios offline with no keys. 34 tests. |
-| Web app (`web/`) | Working on sample data and on B's runner. Donate flow tested end to end on a local NEAR sandbox. 64 unit tests, 8 sandbox tests. |
+| Web app (`web/`) | Working on sample data and on B's runner. Donate flow tested end to end on a local NEAR sandbox. 74 unit tests, 8 sandbox tests. |
 | NEAR Intents payout quotes | Working. Live dry quotes from the 1Click API on mainnet. Sending the payout is not built. |
+| NGO register, bid and proof forms, coordinator confirm and reject | Built. Switched off until the site points at a deployed relief contract. |
 | Relief contract | Not in this repository yet. Not deployed to testnet. |
 | Hosted demo | Not deployed yet. |
 
@@ -80,7 +81,7 @@ Then open http://localhost:3000. The first start compiles the agents package and
 ### 3. Run the tests
 
 ```bash
-pnpm test        # agents (34) and web unit tests (64)
+pnpm test        # agents (34) and web unit tests (74)
 pnpm test:e2e    # donate flow on a local NEAR sandbox (8)
 ```
 

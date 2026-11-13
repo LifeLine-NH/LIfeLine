@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { CoordinatorButtons } from "@/components/ngo/CoordinatorButtons";
 import { OpsConsole } from "@/components/ops/LiveRun";
 import { SectionError } from "@/components/ui/PageError";
-import { ComingNextTag, Skel } from "@/components/ui/tags";
+import { Skel } from "@/components/ui/tags";
 import { attempt } from "@/lib/attempt";
 import { listCaseRows } from "@/lib/caseList";
 import { tally } from "@/lib/caseView";
@@ -47,14 +48,7 @@ async function ReviewQueue() {
           <span className="body-s muted">
             {t.yes} yes · {t.no} no · {t.abs} abstained. Neither rule was met.
           </span>
-          <span className="flex flex-wrap gap-2">
-            <button type="button" className="btn btn-secondary btn-sm" disabled>
-              Confirm
-            </button>
-            <button type="button" className="btn btn-secondary btn-sm" disabled>
-              Reject
-            </button>
-          </span>
+<CoordinatorButtons caseId={c.id} />
         </div>
       ))}
     </div>
@@ -91,12 +85,14 @@ export default function OpsPage() {
             <h2 className="h2">Waiting for a coordinator</h2>
             <p className="muted">Cases where neither rule was met.</p>
           </div>
-          <ComingNextTag />
         </div>
         <Suspense fallback={<Skel h={90} r={20} />}>
           <ReviewQueue />
         </Suspense>
-        <p className="cap">Confirm and Reject need the coordinator role on the live contract. Each decision will be its own transaction.</p>
+        <p className="cap">
+          Only an account registered as a coordinator on the relief contract can confirm or reject; anyone else gets the contract&apos;s refusal. Each decision is its own transaction.
+          {config.chainMode === "stub" ? " Off on sample data." : ""}
+        </p>
       </section>
     </div>
   );

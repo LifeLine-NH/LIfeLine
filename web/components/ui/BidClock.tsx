@@ -14,8 +14,3 @@ export function BidClock({ endsAtMs }: { endsAtMs: number }) {
     </div>
   );
 }
-
-export function BidNote({ endsAtMs }: { endsAtMs: number }) {
-  const ended = useEnded(endsAtMs);
-  return <span className="cap">{ended ? "Waiting for the award" : "Needs a wallet and the live contract"}</span>;
-}

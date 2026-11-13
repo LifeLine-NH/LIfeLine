@@ -12,7 +12,7 @@ How a disaster report becomes a funded, delivered and checked relief case, and w
 | Orchestrator | `agents/src/orchestrator/` | Runs the four verifiers at the same time with timeouts. One verifier failing becomes an abstain and does not block the others. |
 | NGO bidders | `agents/src/ngo/` | Three simulated responder bots that bid on funded cases and submit proof of delivery. |
 | Chain client | `agents/src/chain/client.ts` | Sends `submit_case`, `vote`, `place_bid` and the rest to the relief contract on testnet, or applies the same rules in memory when offline. |
-| Relief contract | not in this repository yet | Holds the pool, counts votes, sets the cap, runs bidding and both payments. Owned by developer A. |
+| Relief contract | `contracts/lifeline` (`contracts/mock-ft`) | Holds the pool, counts votes, sets the cap, runs bidding and both payments. Owned by developer A. See [CONTRACT.md](CONTRACT.md). |
 | Website | `web/` | Reads the contract, serves evidence, runs scenarios through the agents, quotes payouts through NEAR Intents, and lets donors give through their wallet. |
 
 ## The four verifiers

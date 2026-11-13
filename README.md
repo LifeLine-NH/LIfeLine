@@ -11,13 +11,13 @@ Built at NEAR HACKATHON 2026 for the **AI Swarms** and **Open Innovation** track
 | Part | State |
 |---|---|
 | Verifier swarm, intake, simulated NGO bidders (`agents/`) | Working. Runs all four demo scenarios offline with no keys. 34 tests. |
-| Web app (`web/`) | Working on sample data and on B's runner. Donate flow tested end to end on a local NEAR sandbox. 74 unit tests, 8 sandbox tests. |
+| Web app (`web/`) | Working on sample data and on B's runner. Donate and full relief lifecycle tested end to end on a local NEAR sandbox. 74 unit tests, 14 sandbox tests. |
 | NEAR Intents payout quotes | Working. Live dry quotes from the 1Click API on mainnet. Sending the payout is not built. |
-| NGO register, bid and proof forms, coordinator confirm and reject | Built. Switched off until the site points at a deployed relief contract. |
-| Relief contract | Not in this repository yet. Not deployed to testnet. |
+| NGO register, bid and proof forms, coordinator confirm and reject | Built. Switched off until the site is pointed at `lifeline-demo.testnet` (`NEXT_PUBLIC_CONTRACT_ID`). |
+| Relief contract & mock FT (`contracts/`) | Deployed live on NEAR Testnet (`lifeline-demo.testnet` & `usdc.lifeline-demo.testnet`, `$100,000` pool seeded). 16 Rust unit tests + 6 contract sandbox E2E tests. |
 | Hosted demo | Not deployed yet. |
 
-Until the contract is deployed to testnet, the website runs on **sample data** and says so in the header on every page.
+Until the website env points at `lifeline-demo.testnet` (`CHAIN_MODE=testnet`), the website runs on **sample data** and says so in the header on every page.
 
 ## Quick start for judges
 
@@ -81,15 +81,20 @@ Then open http://localhost:3000. The first start compiles the agents package and
 ### 3. Run the tests
 
 ```bash
-pnpm test        # agents (34) and web unit tests (74)
-pnpm test:e2e    # donate flow on a local NEAR sandbox (8)
+pnpm test            # agents (34) and web unit tests (74)
+pnpm test:contracts  # Rust contract unit tests (13 lifeline + 3 mock-ft = 16)
+pnpm test:e2e        # donate (8) and lifeline contract lifecycle (6) on a local NEAR sandbox (14)
 ```
 
 The sandbox tests start a local NEAR node, deploy real `mock_ft.wasm` and `lifeline.wasm` contracts (plus the donate flow fixture), and verify restricted `FunctionCall` keys, donations/refunds, negative security checks, the cap governor, failed payout rollback, full agent scenarios S1–S5, and proof-deadline expiry. The first run downloads the sandbox binary.
 
 ### 4. Testnet and hosted demo
 
-Account provisioning (`scripts/create-accounts.ts`) and testnet deployment (`scripts/deploy-testnet.ts`) are implemented, with the public account hierarchy documented in [docs/ACCOUNTS.md](docs/ACCOUNTS.md). Broadcasting to NEAR testnet requires supplying a funded `NEAR_OWNER_PRIVATE_KEY` in `.env` and running those scripts. See [docs/CONTRACT.md](docs/CONTRACT.md) and [docs/DEMO.md](docs/DEMO.md).
+Live on NEAR Testnet:
+- **Relief contract (`CONTRACT_ID`)**: [`lifeline-demo.testnet`](https://testnet.nearblocks.io/address/lifeline-demo.testnet) (seeded with `100,000` test USDC; intake, coordinator, 4 verifiers, and 3 NGOs registered)
+- **Pool token (`NEXT_PUBLIC_POOL_TOKEN_ID`)**: [`usdc.lifeline-demo.testnet`](https://testnet.nearblocks.io/address/usdc.lifeline-demo.testnet)
+
+See [docs/ACCOUNTS.md](docs/ACCOUNTS.md), [docs/CONTRACT.md](docs/CONTRACT.md), and [docs/DEMO.md](docs/DEMO.md).
 
 ## How it works
 
@@ -137,10 +142,10 @@ Most aid systems ask donors to trust the operator. LifeLine replaces that trust 
 | Outside data in replay mode (`agents/fixtures/`) | Recorded inputs written for the scenarios. **They are not exact copies of the real data sources.** For example, the S1 rainfall figures do not match the Open-Meteo archive for those dates; the Alau Dam flood was caused by the dam failing, not by rain. Live mode calls the real APIs. |
 | Model answers in replay mode (`agents/recordings/`) | Fixed answers written for the demo, so the replay runs with no keys. Live mode calls the models. |
 | NGO bidders | Simulated. Three bots, labelled "Simulated" everywhere they appear on the website. |
-| Relief contract and its rules | Implemented in `contracts/lifeline` and `contracts/mock-ft`, verified with 16 Rust unit tests and 6 NEAR sandbox E2E tests (14 total with donate E2E). Offline runs use an in-memory version of the rules inside `agents/src/chain/client.ts`. |
-| Cases, pool figures and donations on the website | Sample data until the contract is deployed to testnet. Every number then shows a "sample" tag in place of a transaction link. |
+| Relief contract and its rules | Deployed live on NEAR Testnet (`lifeline-demo.testnet`, `usdc.lifeline-demo.testnet`), implemented in `contracts/lifeline` and `contracts/mock-ft`, verified with 16 Rust unit tests and 6 NEAR sandbox E2E tests (14 total with donate E2E). Offline runs use an in-memory version of the rules inside `agents/src/chain/client.ts`. |
+| Cases, pool figures and donations on the website | Live testnet contract `lifeline-demo.testnet` is seeded (`100,000` test USDC); when the website is run without `CHAIN_MODE=testnet`, numbers show a "sample" tag in place of a transaction link. |
 | NEAR Intents quotes | Real, live from the 1Click API on mainnet, as dry runs. Sending a payout this way is not built. |
-| Donate flow | Real transactions, tested on a local NEAR sandbox (including against `lifeline.wasm` in `web/e2e/lifeline.e2e.test.ts`). Not yet broadcast to public testnet. |
+| Donate flow | Real transactions, verified on NEAR Testnet during pool seeding (`ft_transfer_call` on `usdc.lifeline-demo.testnet` -> `lifeline-demo.testnet`) and covered by the 14 local NEAR sandbox tests. |
 
 ## Repository layout
 

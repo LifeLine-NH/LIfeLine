@@ -19,7 +19,8 @@ const GAS_30 = BigInt("30000000000000");
 const GAS_100 = BigInt("100000000000000");
 const ONE_YOCTO = BigInt("1");
 const STORAGE_DEPOSIT = BigInt(utils.format.parseNearAmount("0.0125")!);
-const NGO_STAKE = BigInt(utils.format.parseNearAmount("1")!);
+const NGO_STAKE_NEAR = process.env.NGO_STAKE_NEAR || "0.1";
+const NGO_STAKE = BigInt(utils.format.parseNearAmount(NGO_STAKE_NEAR)!);
 
 function requireEnv(name: string): string {
   const val = process.env[name]?.trim();
@@ -38,14 +39,18 @@ async function tryView<T>(account: Awaited<ReturnType<Awaited<ReturnType<typeof 
 }
 
 async function main() {
+  const redeploy = process.argv.includes("--redeploy");
   const networkId = process.env.NEAR_NETWORK || "testnet";
-  const nodeUrl = process.env.NEAR_RPC_URL || "https://rpc.testnet.near.org";
+  const nodeUrl = process.env.NEAR_RPC_URL || "https://test.rpc.fastnear.com";
   const contractId = process.env.CONTRACT_ID || process.env.NEXT_PUBLIC_CONTRACT_ID || "lifeline-demo.testnet";
   const ftContractId = process.env.NEXT_PUBLIC_POOL_TOKEN_ID || `usdc.${contractId}`;
   const ownerId = process.env.NEAR_OWNER_ACCOUNT_ID || contractId;
+  const intakeId = process.env.INTAKE_ACCOUNT_ID || `intake.${contractId}`;
+  const coordinatorId = process.env.COORDINATOR_ACCOUNT_ID || `coord.${contractId}`;
 
   const ownerPriv = requireEnv("NEAR_OWNER_PRIVATE_KEY");
   const ftPriv = process.env.FT_OWNER_PRIVATE_KEY?.trim() || ownerPriv;
+  const coordPriv = process.env.COORDINATOR_PRIVATE_KEY?.trim();
 
   const mockFtWasmPath = path.join(ROOT_DIR, "contracts", "res", "mock_ft.wasm");
   const lifelineWasmPath = path.join(ROOT_DIR, "contracts", "res", "lifeline.wasm");
@@ -57,6 +62,9 @@ async function main() {
   await keyStore.setKey(networkId, ownerId, KeyPair.fromString(ownerPriv as `ed25519:${string}`));
   await keyStore.setKey(networkId, contractId, KeyPair.fromString(ownerPriv as `ed25519:${string}`));
   await keyStore.setKey(networkId, ftContractId, KeyPair.fromString(ftPriv as `ed25519:${string}`));
+  if (coordPriv) {
+    await keyStore.setKey(networkId, coordinatorId, KeyPair.fromString(coordPriv as `ed25519:${string}`));
+  }
 
   const ngoConfigs = [
     {
@@ -91,10 +99,11 @@ async function main() {
   const contractAccount = await near.account(contractId);
   const ftAccount = await near.account(ftContractId);
 
-  console.log(`[deploy-testnet] Deploying mock-ft to ${ftContractId}...`);
-  await ftAccount.deployContract(fs.readFileSync(mockFtWasmPath));
-
   const ftMeta = await tryView(ownerAccount, ftContractId, "ft_metadata");
+  if (!ftMeta || redeploy) {
+    console.log(`[deploy-testnet] Deploying mock-ft to ${ftContractId}...`);
+    await ftAccount.deployContract(fs.readFileSync(mockFtWasmPath));
+  }
   if (!ftMeta) {
     console.log("[deploy-testnet] Initializing mock-ft (1,000,000 USDC supply)...");
     await ftAccount.functionCall({
@@ -107,13 +116,14 @@ async function main() {
       gas: GAS_30,
     });
   } else {
-    console.log("[deploy-testnet] mock-ft already initialized.");
+    console.log("[deploy-testnet] mock-ft already deployed and initialized.");
   }
 
-  console.log(`[deploy-testnet] Deploying lifeline to ${contractId}...`);
-  await contractAccount.deployContract(fs.readFileSync(lifelineWasmPath));
-
   const existingCfg = await tryView(ownerAccount, contractId, "get_config");
+  if (!existingCfg || redeploy) {
+    console.log(`[deploy-testnet] Deploying lifeline to ${contractId}...`);
+    await contractAccount.deployContract(fs.readFileSync(lifelineWasmPath));
+  }
   if (!existingCfg) {
     console.log("[deploy-testnet] Initializing lifeline contract...");
     await contractAccount.functionCall({
@@ -126,11 +136,13 @@ async function main() {
       gas: GAS_30,
     });
   } else {
-    console.log("[deploy-testnet] lifeline already initialized.");
+    console.log("[deploy-testnet] lifeline already deployed and initialized.");
   }
 
-  // Register token storage for relief contract, owner, and NGOs
-  const storageTargets = [contractId, ownerId, ...ngoConfigs.map((n) => n.id)];
+  // Register token storage for relief contract, owner, coordinator, and NGOs
+  const storageTargets = Array.from(
+    new Set([contractId, ownerId, coordinatorId, ...ngoConfigs.map((n) => n.id)]),
+  );
   for (const accountId of storageTargets) {
     const bal = await tryView<{ total: string } | null>(ownerAccount, ftContractId, "storage_balance_of", {
       account_id: accountId,
@@ -148,8 +160,6 @@ async function main() {
   }
 
   // Register intake, coordinator, and 4 verifier roles
-  const intakeId = process.env.INTAKE_ACCOUNT_ID || `intake.${contractId}`;
-  const coordinatorId = process.env.COORDINATOR_ACCOUNT_ID || `coord.${contractId}`;
   const verifiers: Array<{ id: string; role: "geo" | "fact" | "sev" | "red" }> = [
     { id: process.env.V_GEO_ACCOUNT_ID || `v-geo.${contractId}`, role: "geo" },
     { id: process.env.V_FACT_ACCOUNT_ID || `v-fact.${contractId}`, role: "fact" },
@@ -187,7 +197,7 @@ async function main() {
     }
     const existingNgo = await tryView(ownerAccount, contractId, "get_ngo", { account_id: ngo.id });
     if (!existingNgo) {
-      console.log(`[deploy-testnet] Registering NGO ${ngo.id} with 1 NEAR stake...`);
+      console.log(`[deploy-testnet] Registering NGO ${ngo.id} with ${NGO_STAKE_NEAR} NEAR stake...`);
       const ngoAcct = await near.account(ngo.id);
       await ngoAcct.functionCall({
         contractId,
@@ -203,18 +213,50 @@ async function main() {
   const pool = await tryView<{ balance: string }>(ownerAccount, contractId, "get_pool");
   if (!pool || BigInt(pool.balance) === BigInt(0)) {
     const seedAmount = process.env.SEED_POOL_AMOUNT || "100000000000"; // 100,000 USDC
-    console.log(`[deploy-testnet] Seeding relief pool with ${seedAmount} base units...`);
-    await ownerAccount.functionCall({
-      contractId: ftContractId,
-      methodName: "ft_transfer_call",
-      args: {
-        receiver_id: contractId,
-        amount: seedAmount,
-        msg: "Initial LifeLine relief pool seed",
-      },
-      gas: GAS_100,
-      attachedDeposit: ONE_YOCTO,
-    });
+    if (ownerId === contractId) {
+      if (!coordPriv) {
+        throw new Error(
+          `Cannot seed pool when ownerId === contractId without COORDINATOR_PRIVATE_KEY in .env.`,
+        );
+      }
+      console.log(`[deploy-testnet] Transferring ${seedAmount} base units to ${coordinatorId} and seeding pool...`);
+      await ownerAccount.functionCall({
+        contractId: ftContractId,
+        methodName: "ft_transfer",
+        args: {
+          receiver_id: coordinatorId,
+          amount: seedAmount,
+          memo: "Stage LifeLine relief pool seed",
+        },
+        gas: GAS_30,
+        attachedDeposit: ONE_YOCTO,
+      });
+      const coordAccount = await near.account(coordinatorId);
+      await coordAccount.functionCall({
+        contractId: ftContractId,
+        methodName: "ft_transfer_call",
+        args: {
+          receiver_id: contractId,
+          amount: seedAmount,
+          msg: "Initial LifeLine relief pool seed",
+        },
+        gas: GAS_100,
+        attachedDeposit: ONE_YOCTO,
+      });
+    } else {
+      console.log(`[deploy-testnet] Seeding relief pool with ${seedAmount} base units...`);
+      await ownerAccount.functionCall({
+        contractId: ftContractId,
+        methodName: "ft_transfer_call",
+        args: {
+          receiver_id: contractId,
+          amount: seedAmount,
+          msg: "Initial LifeLine relief pool seed",
+        },
+        gas: GAS_100,
+        attachedDeposit: ONE_YOCTO,
+      });
+    }
   } else {
     console.log(`[deploy-testnet] Pool already funded with ${pool.balance} base units.`);
   }

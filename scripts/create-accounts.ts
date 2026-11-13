@@ -61,7 +61,7 @@ function buildSpecs(contractId: string, ftContractId: string): AccountSpec[] {
       receiverId: ftContractId,
       methodNames: ["*"],
       allowanceNear: "unlimited",
-      initialBalanceNear: "4",
+      initialBalanceNear: "2.6",
     },
     {
       key: "intake",
@@ -73,7 +73,7 @@ function buildSpecs(contractId: string, ftContractId: string): AccountSpec[] {
       receiverId: contractId,
       methodNames: ["submit_case", "close_bidding"],
       allowanceNear: "0.25",
-      initialBalanceNear: "1",
+      initialBalanceNear: "0.2",
     },
     {
       key: "v-geo",
@@ -85,7 +85,7 @@ function buildSpecs(contractId: string, ftContractId: string): AccountSpec[] {
       receiverId: contractId,
       methodNames: ["vote", "vote_delivery"],
       allowanceNear: "0.25",
-      initialBalanceNear: "1",
+      initialBalanceNear: "0.2",
     },
     {
       key: "v-fact",
@@ -97,7 +97,7 @@ function buildSpecs(contractId: string, ftContractId: string): AccountSpec[] {
       receiverId: contractId,
       methodNames: ["vote", "vote_delivery"],
       allowanceNear: "0.25",
-      initialBalanceNear: "1",
+      initialBalanceNear: "0.2",
     },
     {
       key: "v-sev",
@@ -109,7 +109,7 @@ function buildSpecs(contractId: string, ftContractId: string): AccountSpec[] {
       receiverId: contractId,
       methodNames: ["vote", "vote_delivery"],
       allowanceNear: "0.25",
-      initialBalanceNear: "1",
+      initialBalanceNear: "0.2",
     },
     {
       key: "v-red",
@@ -121,7 +121,7 @@ function buildSpecs(contractId: string, ftContractId: string): AccountSpec[] {
       receiverId: contractId,
       methodNames: ["vote", "vote_delivery"],
       allowanceNear: "0.25",
-      initialBalanceNear: "1",
+      initialBalanceNear: "0.2",
     },
     {
       key: "ngo-1",
@@ -130,10 +130,10 @@ function buildSpecs(contractId: string, ftContractId: string): AccountSpec[] {
       envIdKey: "NGO_1_ACCOUNT_ID",
       envPrivKey: "NGO_1_PRIVATE_KEY",
       accessKeyType: "FullAccess",
-      receiverId: "any (stake requires 1 NEAR attached deposit)",
+      receiverId: "any (stake requires 0.1 NEAR attached deposit)",
       methodNames: ["register_ngo", "place_bid", "submit_proof"],
       allowanceNear: "unlimited",
-      initialBalanceNear: "2.5",
+      initialBalanceNear: "0.3",
     },
     {
       key: "ngo-2",
@@ -142,10 +142,10 @@ function buildSpecs(contractId: string, ftContractId: string): AccountSpec[] {
       envIdKey: "NGO_2_ACCOUNT_ID",
       envPrivKey: "NGO_2_PRIVATE_KEY",
       accessKeyType: "FullAccess",
-      receiverId: "any (stake requires 1 NEAR attached deposit)",
+      receiverId: "any (stake requires 0.1 NEAR attached deposit)",
       methodNames: ["register_ngo", "place_bid", "submit_proof"],
       allowanceNear: "unlimited",
-      initialBalanceNear: "2.5",
+      initialBalanceNear: "0.3",
     },
     {
       key: "ngo-3",
@@ -154,10 +154,10 @@ function buildSpecs(contractId: string, ftContractId: string): AccountSpec[] {
       envIdKey: "NGO_3_ACCOUNT_ID",
       envPrivKey: "NGO_3_PRIVATE_KEY",
       accessKeyType: "FullAccess",
-      receiverId: "any (stake requires 1 NEAR attached deposit)",
+      receiverId: "any (stake requires 0.1 NEAR attached deposit)",
       methodNames: ["register_ngo", "place_bid", "submit_proof"],
       allowanceNear: "unlimited",
-      initialBalanceNear: "2.5",
+      initialBalanceNear: "0.3",
     },
     {
       key: "coordinator",
@@ -169,7 +169,7 @@ function buildSpecs(contractId: string, ftContractId: string): AccountSpec[] {
       receiverId: contractId,
       methodNames: ["human_confirm", "human_reject"],
       allowanceNear: "unlimited",
-      initialBalanceNear: "1",
+      initialBalanceNear: "0.2",
     },
   ];
   return specs;
@@ -313,6 +313,21 @@ async function provisionOnTestnet(
     }
 
     if (spec.accessKeyType === "FunctionCall") {
+      if (exists) {
+        const keyExists = await near.connection.provider
+          .query({
+            request_type: "view_access_key",
+            finality: "final",
+            account_id: spec.accountId,
+            public_key: publicKey,
+          })
+          .then(() => true)
+          .catch(() => false);
+        if (keyExists) {
+          entry.status = "Existing on testnet (restricted FunctionCall key)";
+          continue;
+        }
+      }
       const subKeyToSign = exists ? privateKey : tempFullKey.toString();
       await keyStore.setKey(networkId, spec.accountId, KeyPair.fromString(subKeyToSign as `ed25519:${string}`));
       const subAccount = await near.account(spec.accountId);
@@ -332,7 +347,7 @@ async function provisionOnTestnet(
 async function main() {
   const flags = parseFlags(process.argv.slice(2));
   const network = process.env.NEAR_NETWORK || "testnet";
-  const rpcUrl = process.env.NEAR_RPC_URL || "https://rpc.testnet.near.org";
+  const rpcUrl = process.env.NEAR_RPC_URL || "https://test.rpc.fastnear.com";
   const contractId = process.env.CONTRACT_ID || process.env.NEXT_PUBLIC_CONTRACT_ID || "lifeline-demo.testnet";
   const ftContractId = process.env.NEXT_PUBLIC_POOL_TOKEN_ID || `usdc.${contractId}`;
   const ownerAccountId = process.env.NEAR_OWNER_ACCOUNT_ID || contractId;

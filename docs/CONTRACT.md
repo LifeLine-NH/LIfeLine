@@ -139,5 +139,5 @@ Minimal NEAR Fungible Token (`contracts/mock-ft/src/lib.rs`) used for local sand
 | Environment | Status | Details |
 |---|---|---|
 | **Local NEAR Sandbox** | **Verified** | `pnpm test:e2e` deploys real `mock_ft.wasm` and `lifeline.wasm`, tests restricted keys, donations/refunds, negative security checks, cap governor, `ft_transfer` failure rollback, agent scenarios S1–S5, and proof-deadline expiry (14/14 passing). |
-| **NEAR Testnet** | **Scripted, not yet broadcast** | Account hierarchy documented in [ACCOUNTS.md](ACCOUNTS.md); deployment automated via `scripts/create-accounts.ts` and `scripts/deploy-testnet.ts`. Requires `NEAR_OWNER_PRIVATE_KEY` to fund and broadcast. |
+| **NEAR Testnet** | **Deployed Live** | Relief contract deployed and initialized at [`lifeline-demo.testnet`](https://testnet.nearblocks.io/address/lifeline-demo.testnet); pool token [`usdc.lifeline-demo.testnet`](https://testnet.nearblocks.io/address/usdc.lifeline-demo.testnet) initialized with `1,000,000` `USDC` (6 decimals) and relief pool seeded with `100,000 USDC` (`100000000000`). Intake, coordinator, 4 verifiers, and 3 NGOs (`0.1 NEAR` bond each) registered on-chain. See [ACCOUNTS.md](ACCOUNTS.md). |
 | **NEAR Mainnet** | **Skipped (out of scope)** | Intentionally omitted for hackathon scope; contract logic, tests, and testnet deployment scripts are the target deliverables. |

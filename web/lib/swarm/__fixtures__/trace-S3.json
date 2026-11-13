@@ -1,0 +1,421 @@
+{
+  "scenario_id": "S3",
+  "case_id": "s1t7d-2025-02-01-001-s3",
+  "mode": "replay",
+  "chain_mode": "stub",
+  "bundle_hash": "5e67e7b3c5579ae0049c9b65914adc19a40a8825bdfac1ec9edbc1a6367f023d",
+  "bundle": {
+    "case_id": "s1t7d-2025-02-01-001-s3",
+    "geohash": "s1t7d",
+    "centroid": {
+      "lat": 9.0579,
+      "lon": 7.4951
+    },
+    "radius_m": 0,
+    "window": {
+      "from": "2025-02-01T12:00:01.000Z",
+      "to": "2025-02-01T12:01:57.000Z"
+    },
+    "incident_type": "flood",
+    "requested_tier": 4,
+    "reports": [
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 01]",
+        "ts": "2025-02-01T12:00:01Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 02]",
+        "ts": "2025-02-01T12:00:05Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 03]",
+        "ts": "2025-02-01T12:00:09Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 04]",
+        "ts": "2025-02-01T12:00:13Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 05]",
+        "ts": "2025-02-01T12:00:17Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 06]",
+        "ts": "2025-02-01T12:00:21Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 07]",
+        "ts": "2025-02-01T12:00:25Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 08]",
+        "ts": "2025-02-01T12:00:29Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 09]",
+        "ts": "2025-02-01T12:00:33Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 10]",
+        "ts": "2025-02-01T12:00:37Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 11]",
+        "ts": "2025-02-01T12:00:41Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 12]",
+        "ts": "2025-02-01T12:00:45Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 13]",
+        "ts": "2025-02-01T12:00:49Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 14]",
+        "ts": "2025-02-01T12:00:53Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 15]",
+        "ts": "2025-02-01T12:00:57Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 16]",
+        "ts": "2025-02-01T12:01:01Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 17]",
+        "ts": "2025-02-01T12:01:05Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 18]",
+        "ts": "2025-02-01T12:01:09Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 19]",
+        "ts": "2025-02-01T12:01:13Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 20]",
+        "ts": "2025-02-01T12:01:17Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 21]",
+        "ts": "2025-02-01T12:01:21Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 22]",
+        "ts": "2025-02-01T12:01:25Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 23]",
+        "ts": "2025-02-01T12:01:29Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 24]",
+        "ts": "2025-02-01T12:01:33Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 25]",
+        "ts": "2025-02-01T12:01:37Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 26]",
+        "ts": "2025-02-01T12:01:41Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 27]",
+        "ts": "2025-02-01T12:01:45Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 28]",
+        "ts": "2025-02-01T12:01:49Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 29]",
+        "ts": "2025-02-01T12:01:53Z"
+      },
+      {
+        "source_type": "sms_relay",
+        "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+        "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 30]",
+        "ts": "2025-02-01T12:01:57Z"
+      }
+    ],
+    "source_diversity": 1,
+    "external_evidence": [
+      {
+        "tool": "open-meteo",
+        "claim": "No significant rainfall: 0.2mm total precipitation recorded over window (dry conditions)",
+        "supports": "no",
+        "url": "https://archive-api.open-meteo.com/v1/archive?latitude=9.06&longitude=7.50&start_date=2025-01-30&end_date=2025-02-01&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+        "retrieved_at": "2025-02-01T12:10:00Z",
+        "raw_hash": "e432bae881245fd8be619a73353913a167ea7e9fa50fb44d4fa2b9d891cde0b7"
+      },
+      {
+        "tool": "gdacs",
+        "claim": "No active GDACS disaster alert found in region/window",
+        "supports": "no",
+        "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+        "retrieved_at": "2025-02-01T12:10:00Z",
+        "raw_hash": "7a6178a0e78d787a9eff2accb73d3f2a806095a019b6de9d247074d1d672ff6d"
+      },
+      {
+        "tool": "reliefweb",
+        "claim": "No corroborating UN OCHA ReliefWeb situation reports found for region/window",
+        "supports": "no",
+        "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Abuja+flood+2025-02",
+        "retrieved_at": "2025-02-01T12:10:00Z",
+        "raw_hash": "44acf7039f7125770dc3d5e6f9fb2566795913d901463e9a2ae4aa278bef4f05"
+      },
+      {
+        "tool": "usgs",
+        "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+        "supports": "unclear",
+        "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=9.06&longitude=7.50&maxradiuskm=150&starttime=2025-01-31&endtime=2025-02-02",
+        "retrieved_at": "2025-02-01T12:10:00Z",
+        "raw_hash": "753cb899c39e366123ee7c5c96e75a560b00474ddb0465049d9c95fe8ec21707"
+      }
+    ],
+    "mode": "replay"
+  },
+  "submit_tx_hash": "sbx_21544cb80d618fed740e110d9ee497061ce79d9d",
+  "verifier_steps": [
+    {
+      "role": "geo",
+      "signer_account": "v-geo.lifeline-demo.testnet",
+      "vote_record": {
+        "case_id": "s1t7d-2025-02-01-001-s3",
+        "agent": "geo",
+        "model": "deterministic-cluster-v1",
+        "verdict": "No",
+        "confidence_bps": 9700,
+        "tier": 0,
+        "reasoning": "Sybil / single-source concentration detected: top source accounts for 100.0% of all 30 reports (source_diversity=1, threshold >=80% rejects).",
+        "tool_calls": [],
+        "attestation": null
+      },
+      "evidence_hash": "b918f903ae9d0334dbdcf00e6b13c1b33346d271710789c6019f0daef75328bd",
+      "tx_hash": "sbx_c3fa3fa49be042122cd367dd0ee39b7757b10d26",
+      "duration_ms": 1
+    },
+    {
+      "role": "fact",
+      "signer_account": "v-fact.lifeline-demo.testnet",
+      "vote_record": {
+        "case_id": "s1t7d-2025-02-01-001-s3",
+        "agent": "fact",
+        "model": "fireworks::accounts/fireworks/models/llama-v3p1-70b-instruct (replay)",
+        "verdict": "No",
+        "confidence_bps": 9500,
+        "tier": 0,
+        "reasoning": "Claim contradicted by external tools: Open-Meteo recorded only 0.2mm precipitation (dry conditions) and neither GDACS nor ReliefWeb has any flood alert or report for the area.",
+        "tool_calls": [
+          {
+            "tool": "open-meteo",
+            "claim": "No significant rainfall: 0.2mm total precipitation recorded over window (dry conditions)",
+            "supports": "no",
+            "url": "https://archive-api.open-meteo.com/v1/archive?latitude=9.06&longitude=7.50&start_date=2025-01-30&end_date=2025-02-01&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "e432bae881245fd8be619a73353913a167ea7e9fa50fb44d4fa2b9d891cde0b7"
+          },
+          {
+            "tool": "gdacs",
+            "claim": "No active GDACS disaster alert found in region/window",
+            "supports": "no",
+            "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "7a6178a0e78d787a9eff2accb73d3f2a806095a019b6de9d247074d1d672ff6d"
+          },
+          {
+            "tool": "reliefweb",
+            "claim": "No corroborating UN OCHA ReliefWeb situation reports found for region/window",
+            "supports": "no",
+            "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Abuja+flood+2025-02",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "44acf7039f7125770dc3d5e6f9fb2566795913d901463e9a2ae4aa278bef4f05"
+          },
+          {
+            "tool": "usgs",
+            "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+            "supports": "unclear",
+            "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=9.06&longitude=7.50&maxradiuskm=150&starttime=2025-01-31&endtime=2025-02-02",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "753cb899c39e366123ee7c5c96e75a560b00474ddb0465049d9c95fe8ec21707"
+          }
+        ],
+        "attestation": null
+      },
+      "evidence_hash": "d66f8f734148f9f326a80fb1141c41586aaa0c4762b30757a3d313fb27ed8e45",
+      "tx_hash": "sbx_508c7a6b5d948f24a05aeaaef5e78f1c3c4e4d90",
+      "duration_ms": 1
+    },
+    {
+      "role": "sev",
+      "signer_account": "v-sev.lifeline-demo.testnet",
+      "vote_record": {
+        "case_id": "s1t7d-2025-02-01-001-s3",
+        "agent": "sev",
+        "model": "fireworks::accounts/fireworks/models/qwen2p5-72b-instruct (replay)",
+        "verdict": "No",
+        "confidence_bps": 9400,
+        "tier": 1,
+        "reasoning": "Assigning Severity Tier 1 (No Funding): All 30 reports originate from a single source_id (source_diversity=1) with no corroborating weather or humanitarian evidence.",
+        "tool_calls": [
+          {
+            "tool": "open-meteo",
+            "claim": "No significant rainfall: 0.2mm total precipitation recorded over window (dry conditions)",
+            "supports": "no",
+            "url": "https://archive-api.open-meteo.com/v1/archive?latitude=9.06&longitude=7.50&start_date=2025-01-30&end_date=2025-02-01&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "e432bae881245fd8be619a73353913a167ea7e9fa50fb44d4fa2b9d891cde0b7"
+          },
+          {
+            "tool": "gdacs",
+            "claim": "No active GDACS disaster alert found in region/window",
+            "supports": "no",
+            "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "7a6178a0e78d787a9eff2accb73d3f2a806095a019b6de9d247074d1d672ff6d"
+          },
+          {
+            "tool": "reliefweb",
+            "claim": "No corroborating UN OCHA ReliefWeb situation reports found for region/window",
+            "supports": "no",
+            "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Abuja+flood+2025-02",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "44acf7039f7125770dc3d5e6f9fb2566795913d901463e9a2ae4aa278bef4f05"
+          },
+          {
+            "tool": "usgs",
+            "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+            "supports": "unclear",
+            "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=9.06&longitude=7.50&maxradiuskm=150&starttime=2025-01-31&endtime=2025-02-02",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "753cb899c39e366123ee7c5c96e75a560b00474ddb0465049d9c95fe8ec21707"
+          }
+        ],
+        "attestation": null
+      },
+      "evidence_hash": "4d6937529a92fd2dc89d13bda10c0c500a26ababf3ac66581c2b712a471bfbe7",
+      "tx_hash": "sbx_d8f4d520ad83625193ee8e21c507b3731b875fce",
+      "duration_ms": 0
+    },
+    {
+      "role": "red",
+      "signer_account": "v-red.lifeline-demo.testnet",
+      "vote_record": {
+        "case_id": "s1t7d-2025-02-01-001-s3",
+        "agent": "red",
+        "model": "gpt-4o-mini (replay)",
+        "verdict": "No",
+        "confidence_bps": 9900,
+        "tier": 0,
+        "reasoning": "Objection cannot be rebutted: textbook Sybil botnet attack from a single sender with zero meteorological or humanitarian corroboration.",
+        "strongest_objection": "All 30 reports were sent by a single source_id (source_diversity = 1) every 4 seconds using an identical bot template ('URGENT FLOOD ALERT: Severe flooding in sector 4... [msg NN]'), with 0.2mm rain and zero external alerts.",
+        "can_be_rebutted": false,
+        "tool_calls": [
+          {
+            "tool": "open-meteo",
+            "claim": "No significant rainfall: 0.2mm total precipitation recorded over window (dry conditions)",
+            "supports": "no",
+            "url": "https://archive-api.open-meteo.com/v1/archive?latitude=9.06&longitude=7.50&start_date=2025-01-30&end_date=2025-02-01&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "e432bae881245fd8be619a73353913a167ea7e9fa50fb44d4fa2b9d891cde0b7"
+          },
+          {
+            "tool": "gdacs",
+            "claim": "No active GDACS disaster alert found in region/window",
+            "supports": "no",
+            "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "7a6178a0e78d787a9eff2accb73d3f2a806095a019b6de9d247074d1d672ff6d"
+          },
+          {
+            "tool": "reliefweb",
+            "claim": "No corroborating UN OCHA ReliefWeb situation reports found for region/window",
+            "supports": "no",
+            "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Abuja+flood+2025-02",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "44acf7039f7125770dc3d5e6f9fb2566795913d901463e9a2ae4aa278bef4f05"
+          },
+          {
+            "tool": "usgs",
+            "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+            "supports": "unclear",
+            "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=9.06&longitude=7.50&maxradiuskm=150&starttime=2025-01-31&endtime=2025-02-02",
+            "retrieved_at": "2025-02-01T12:10:00Z",
+            "raw_hash": "753cb899c39e366123ee7c5c96e75a560b00474ddb0465049d9c95fe8ec21707"
+          }
+        ],
+        "attestation": null
+      },
+      "evidence_hash": "c2b2769b583c481626d54f02a84c2418abf808d671823f6730306f847d4126a5",
+      "tx_hash": "sbx_f1471dd900a702e29c32988f2d8d52a9daf546c7",
+      "duration_ms": 0
+    }
+  ],
+  "post_vote_status": "Rejected",
+  "cap_amount": "0",
+  "final_status": "Rejected",
+  "started_at": "2026-11-12T14:19:45.382Z",
+  "completed_at": "2026-11-12T14:19:45.387Z"
+}

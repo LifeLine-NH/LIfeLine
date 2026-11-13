@@ -1,0 +1,124 @@
+/* LifeLine "Quorum" theme for Tailwind CSS v4.
+ * lifeline.css holds the raw tokens (:root) and the component classes from the design handoff.
+ * The @theme block exposes the same tokens as Tailwind utilities (bg-paper, text-ink-2, rounded-card …).
+ * Fonts are loaded with next/font in app/layout.tsx and bound to --font-bricolage, --font-inter, --font-jbm.
+ */
+
+@import "tailwindcss";
+@import "./lifeline.css";
+
+@theme {
+  --font-display: var(--font-bricolage), "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-jbm), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --color-paper: #F6F5F1;
+  --color-surface: #FFFFFF;
+  --color-sunken: #EFEEE8;
+  --color-ink: #15171C;
+  --color-ink-2: #464B57;
+  --color-ink-3: #62677A;
+  --color-line: #E3E1D9;
+  --color-line-2: #CDCAC0;
+
+  --color-accent: #3442D9;
+  --color-accent-ink: #2531B8;
+  --color-accent-tint: #ECEEFE;
+
+  --color-st-progress: #0B6F86;   --color-st-progress-tint: #E1F2F5;
+  --color-st-funded: #3442D9;     --color-st-funded-tint: #ECEEFE;
+  --color-st-delivered: #0A7A55;  --color-st-delivered-tint: #E2F4EC;
+  --color-st-review: #94570A;     --color-st-review-tint: #FCF0D9;
+  --color-st-rejected: #BE321A;   --color-st-rejected-tint: #FBE8E2;
+  --color-st-expired: #5B6070;    --color-st-expired-tint: #ECECE8;
+
+  --color-v-yes: #0A7A55;
+  --color-v-no: #BE321A;
+  --color-v-abs: #6A6F7E;
+  --color-v-wait: #B9BBC3;
+
+  --color-stage: #0E1014;
+  --color-stage-2: #171A21;
+  --color-stage-3: #20242D;
+  --color-stage-line: #2C313C;
+  --color-stage-ink: #F2F1EC;
+  --color-stage-ink-2: #A9ADB9;
+  --color-stage-yes: #3FD69B;
+  --color-stage-no: #FF7A5C;
+  --color-stage-accent: #8C96FF;
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-card: 20px;
+
+  --shadow-1: 0 1px 2px rgba(21,23,28,.06), 0 0 0 1px rgba(21,23,28,.03);
+  --shadow-2: 0 10px 28px -12px rgba(21,23,28,.18), 0 1px 2px rgba(21,23,28,.06);
+  --shadow-3: 0 28px 56px -20px rgba(21,23,28,.28);
+
+  --ease-out-soft: cubic-bezier(.2,.8,.2,1);
+  --ease-land: cubic-bezier(.2,1.4,.4,1);
+}
+
+html { background: var(--color-paper); color-scheme: light; }
+body { font-family: var(--font-sans); color: var(--color-ink); }
+
+/* ---------- App additions on top of the handoff ---------- */
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* Header stays on top while the page scrolls under it. */
+.hdr { position: sticky; top: 0; z-index: 30; }
+
+/* Disabled status helper for ghost links that have no target yet. */
+.rec-off { display: inline-flex; align-items: center; gap: 5px; font-size: 13.5px; font-weight: 500; color: var(--ink-3); }
+
+/* Hero caption: the separators wrap with their phrase instead of dangling at the end of a line. */
+.hero-rules { display: flex; flex-wrap: wrap; gap: 6px 0; }
+.hero-rules span + span::before { content: "·"; margin: 0 12px; color: var(--ink-3); }
+
+/* Case header seal sits centered when it wraps under the text on narrow screens. */
+.case-seal { flex: 1 1 260px; display: flex; justify-content: center; }
+@media (min-width: 1000px) { .case-seal { flex: 0 0 auto; } }
+
+/* Coordinator row: stack on phones instead of squeezing three columns. */
+.queue-row { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.6fr) auto; }
+@media (max-width: 720px) {
+  .queue-row { grid-template-columns: minmax(0, 1fr); }
+  .btn-lg.btn-ghost { padding-left: 0; }
+}
+
+/* Hash check result rows must wrap long hashes inside their box. */
+.hc-verdict { white-space: normal; align-items: flex-start; }
+.hc-verdict::before { margin-top: -3px; }
+.hc-verdict::after { top: 11px; }
+
+/* Payout preview card: dashed and striped means "not connected yet". */
+.soon-card { border-style: dashed; box-shadow: none; background: repeating-linear-gradient(-45deg, #FFFFFF 0 10px, #FBFAF7 10px 20px); }
+
+/* Countdown digits keep their width while ticking. */
+.tick { font-variant-numeric: tabular-nums; }
+
+/* Accounts truncate with an ellipsis wherever they sit. */
+.acct { display: inline-block; max-width: 100%; vertical-align: bottom; }
+
+/* Phone header: badges get their own row under the nav. */
+.modes-phone { order: 4; width: 100%; }
+@media (max-width: 720px) { .modes.show-sm { display: flex; } }
+
+/* Page sections that load on their own fade in gently. */
+.fade-in { animation: ll-arrive .4s cubic-bezier(.2,.9,.3,1) both; }
+
+@media (max-width: 720px) {
+  .hero-rules { gap: 4px 14px; }
+  .hero-rules span + span::before { display: none; }
+}
+
+/* Filter chips are links on the cases page; keep chip colors. */
+.ll a.chip-btn { color: var(--ink-2); text-decoration: none; }
+.ll a.chip-btn:hover { color: var(--ink); }
+.ll a.chip-btn.on { color: #fff; }
+
+/* Cap calculator: room for the amount plus its sample tag. */
+.capbar { grid-template-columns: 140px minmax(0, 1fr) 170px; }
+@media (max-width: 720px) { .capbar { grid-template-columns: minmax(0, 1fr) auto; } }

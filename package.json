@@ -2,11 +2,16 @@
   "name": "lifeline",
   "version": "0.1.0",
   "private": true,
-  "description": "LIFELINE — Decentralized AI Verifier Swarm & Relief Escrow on NEAR",
+  "description": "LifeLine: an AI verifier swarm and relief escrow on NEAR",
   "scripts": {
+    "dev": "pnpm --filter @lifeline/web dev",
+    "build": "pnpm --filter @lifeline/web build",
+    "test": "pnpm --filter @lifeline/agents test && pnpm --filter @lifeline/web test",
+    "test:agents": "pnpm --filter @lifeline/agents test",
+    "test:web": "pnpm --filter @lifeline/web test",
+    "test:e2e": "pnpm --filter @lifeline/web test:e2e",
     "swarm:run": "pnpm --filter @lifeline/agents swarm:run",
-    "demo:replay": "pnpm --filter @lifeline/agents demo:replay",
-    "test:agents": "pnpm --filter @lifeline/agents test"
+    "demo:replay": "pnpm --filter @lifeline/agents demo:replay"
   },
   "engines": {
     "node": ">=20.0.0"

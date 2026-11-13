@@ -99,7 +99,7 @@ async function main() {
     console.log("[deploy-testnet] Initializing mock-ft (1,000,000 USDC supply)...");
     await ftAccount.functionCall({
       contractId: ftContractId,
-      methodName: "new",
+      methodName: "new_default_meta",
       args: {
         owner_id: ownerId,
         total_supply: "1000000000000", // 1,000,000 USDC (6 decimals)
@@ -161,20 +161,20 @@ async function main() {
   await ownerAccount.functionCall({
     contractId,
     methodName: "register_intake",
-    args: { account_id: intakeId },
+    args: { account: intakeId },
     gas: GAS_30,
   });
   await ownerAccount.functionCall({
     contractId,
     methodName: "register_coordinator",
-    args: { account_id: coordinatorId },
+    args: { account: coordinatorId },
     gas: GAS_30,
   });
   for (const v of verifiers) {
     await ownerAccount.functionCall({
       contractId,
       methodName: "register_verifier",
-      args: { account_id: v.id, role: v.role },
+      args: { account: v.id, role: v.role },
       gas: GAS_30,
     });
   }

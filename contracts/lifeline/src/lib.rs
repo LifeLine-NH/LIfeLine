@@ -877,7 +877,7 @@ impl Lifeline {
         );
         let can_record = matches!(
             c.status,
-            Status::ProofSubmitted | Status::Delivered
+            Status::ProofSubmitted | Status::Delivered | Status::Awarded | Status::Expired
         );
         require!(
             can_record,
@@ -1652,7 +1652,7 @@ mod tests {
         ctx("ngo-1.testnet", 0, t0 + 20 * NANOS_PER_SEC);
         c.submit_proof("c1".into(), "bad1".into(), "/api/evidence/bad1".into());
 
-        for v in ["v-fact.testnet", "v-sev.testnet", "v-red.testnet"] {
+        for v in ["v-geo.testnet", "v-fact.testnet", "v-sev.testnet", "v-red.testnet"] {
             ctx(v, 0, t0 + 25 * NANOS_PER_SEC);
             let _ = c.vote_delivery("c1".into(), false, "r".repeat(64));
         }
@@ -1660,15 +1660,17 @@ mod tests {
         let after_first_reject = c.get_case("c1".into()).unwrap();
         assert_eq!(after_first_reject.status, Status::Awarded);
         assert_eq!(after_first_reject.delivery_retry_count, 1);
+        assert_eq!(c.get_delivery_votes("c1".into()).len(), 4);
 
         // Attempt 2: bad proof again -> 3 not-ok -> Expired & escrow unreserved
         ctx("ngo-1.testnet", 0, t0 + 30 * NANOS_PER_SEC);
         c.submit_proof("c1".into(), "bad2".into(), "/api/evidence/bad2".into());
 
-        for v in ["v-fact.testnet", "v-sev.testnet", "v-red.testnet"] {
+        for v in ["v-geo.testnet", "v-fact.testnet", "v-sev.testnet", "v-red.testnet"] {
             ctx(v, 0, t0 + 35 * NANOS_PER_SEC);
             let _ = c.vote_delivery("c1".into(), false, "r".repeat(64));
         }
+        assert_eq!(c.get_delivery_votes("c1".into()).len(), 4);
 
         let after_second_reject = c.get_case("c1".into()).unwrap();
         assert_eq!(after_second_reject.status, Status::Expired);

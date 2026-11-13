@@ -1,0 +1,14 @@
+[package]
+name = "mock-ft"
+version = "0.1.0"
+edition = "2021"
+description = "TESTNET ONLY NEP-141 mock fungible token with public mint faucet for LifeLine"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = { version = "=5.5.0", default-features = false }
+
+[dev-dependencies]
+near-sdk = { version = "=5.5.0", default-features = false, features = ["unit-testing"] }

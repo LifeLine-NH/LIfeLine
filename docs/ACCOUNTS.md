@@ -15,17 +15,17 @@
 
 | Account ID | Role | Key Type | Allowed Methods | Allowance | Public Key | Provisioning Status |
 |---|---|---|---|---|---|---|
-| `lifeline-demo.testnet` | LifeLine relief pool & escrow contract | `FullAccess` | `*` | FullAccess | `ed25519:DJTrKzwRNanhpksDav6cmXjPDQSkJ7YJmcTLquaVZoXo` | Keypair prepared (offline) |
-| `usdc.lifeline-demo.testnet` | Mock USDC (NEP-141 + testnet faucet) contract | `FullAccess` | `*` | FullAccess | `ed25519:B5HHJqrDfWo3yH5Xi2chRyRLNR25iSKEFanBx8iNBzaq` | Keypair prepared (offline) |
-| `intake.lifeline-demo.testnet` | Intake oracle (submits clustered cases & closes bidding) | `FunctionCall` | `submit_case`, `close_bidding` | 0.25 NEAR | `ed25519:8uFPRo9kPYcc8fQsHXbaynDaDNcHELbru85GSRfwf1en` | Keypair prepared (offline) |
-| `v-geo.lifeline-demo.testnet` | Verifier: Geo consistency (deterministic code) | `FunctionCall` | `vote`, `vote_delivery` | 0.25 NEAR | `ed25519:D2b4RpaKDAe3hgd1oFoaEZ1s5kUczEwqjmKaN2Ud9nwz` | Keypair prepared (offline) |
-| `v-fact.lifeline-demo.testnet` | Verifier: External evidence & fact check | `FunctionCall` | `vote`, `vote_delivery` | 0.25 NEAR | `ed25519:FpqW8UatPn1NXmiPBeGDJ7mELRSypNmgei59GTrmMrj4` | Keypair prepared (offline) |
-| `v-sev.lifeline-demo.testnet` | Verifier: Severity tier classifier | `FunctionCall` | `vote`, `vote_delivery` | 0.25 NEAR | `ed25519:T46Z4ZMhfbz2rxkoasCHvPmSLTSTpTmY5UifioTYj6y` | Keypair prepared (offline) |
-| `v-red.lifeline-demo.testnet` | Verifier: Adversarial red team & injection guard | `FunctionCall` | `vote`, `vote_delivery` | 0.25 NEAR | `ed25519:3u6cYmg9VHtLtFTEeoCQ8dAcSr4TrbhRdmp3i9JheT7d` | Keypair prepared (offline) |
-| `ngo-rapid.lifeline-demo.testnet` | Responder NGO #1 (stake, place_bid, submit_proof) | `FullAccess` | `register_ngo`, `place_bid`, `submit_proof` | FullAccess | `ed25519:8sFaFmK7YoGRNohChzMZsEvEkLfobeaJFJgGNWWxJXyb` | Keypair prepared (offline) |
-| `ngo-balanced.lifeline-demo.testnet` | Responder NGO #2 (stake, place_bid, submit_proof) | `FullAccess` | `register_ngo`, `place_bid`, `submit_proof` | FullAccess | `ed25519:CdTB2ZRW3wzk1KFzHrJia2SZbjQYFLuAx8Rzqg6E3uxt` | Keypair prepared (offline) |
-| `ngo-frugal.lifeline-demo.testnet` | Responder NGO #3 (stake, place_bid, submit_proof) | `FullAccess` | `register_ngo`, `place_bid`, `submit_proof` | FullAccess | `ed25519:EiGrnfivQupb2CAW1Aih7q1P1B6vKZa1ZFn8cJ4xoJV8` | Keypair prepared (offline) |
-| `coord.lifeline-demo.testnet` | Human tie-break coordinator (human_confirm / human_reject) | `FullAccess` | `human_confirm`, `human_reject` | FullAccess | `ed25519:A17FUwNF8436ZLidfegM1wJEUzMMpVXgYAe73QvMNUTr` | Keypair prepared (offline) |
+| `lifeline-demo.testnet` | LifeLine relief pool & escrow contract | `FullAccess` | `*` | FullAccess | `ed25519:4jNHvxMqSgg2njSmKBHjywfWkEE7dYSjYMCAhbDRNoPg` | Keypair prepared (offline) |
+| `usdc.lifeline-demo.testnet` | Mock USDC (NEP-141 + testnet faucet) contract | `FullAccess` | `*` | FullAccess | `ed25519:D16bTsHED5vmFxoZcfCbpptRiaGiRZ1xqeTi6RdAnhwm` | Keypair prepared (offline) |
+| `intake.lifeline-demo.testnet` | Intake oracle (submits clustered cases & closes bidding) | `FunctionCall` | `submit_case`, `close_bidding` | 0.25 NEAR | `ed25519:5YSjGsJhycqJkLSeuicu42SoaG94hkQXU4xasbvr9WWz` | Keypair prepared (offline) |
+| `v-geo.lifeline-demo.testnet` | Verifier: Geo consistency (deterministic code) | `FunctionCall` | `vote`, `vote_delivery` | 0.25 NEAR | `ed25519:8Sn1p5e5DhSxuEY3EvYJcCcepQVco6PRXaQ7pZtyc755` | Keypair prepared (offline) |
+| `v-fact.lifeline-demo.testnet` | Verifier: External evidence & fact check | `FunctionCall` | `vote`, `vote_delivery` | 0.25 NEAR | `ed25519:43KiyH6ZkgYAHd7RqAy9XZygqnGkQRfgkaKXk7ky3Npj` | Keypair prepared (offline) |
+| `v-sev.lifeline-demo.testnet` | Verifier: Severity tier classifier | `FunctionCall` | `vote`, `vote_delivery` | 0.25 NEAR | `ed25519:494Tbg7UY16bidWWuofsQe5SDuwbSHfssqD1YWbCjQv7` | Keypair prepared (offline) |
+| `v-red.lifeline-demo.testnet` | Verifier: Adversarial red team & injection guard | `FunctionCall` | `vote`, `vote_delivery` | 0.25 NEAR | `ed25519:ZaWwp6ZMp4PVw1nLNt8jwBn5LDFtD7T8p4j3iimqUYB` | Keypair prepared (offline) |
+| `ngo-rapid.lifeline-demo.testnet` | Responder NGO #1 (stake, place_bid, submit_proof) | `FullAccess` | `register_ngo`, `place_bid`, `submit_proof` | FullAccess | `ed25519:7mZVcnufm8ZJv3tWWxssaEE7PNpPmBHd6wqCVfpL8Lop` | Keypair prepared (offline) |
+| `ngo-balanced.lifeline-demo.testnet` | Responder NGO #2 (stake, place_bid, submit_proof) | `FullAccess` | `register_ngo`, `place_bid`, `submit_proof` | FullAccess | `ed25519:DWj2SGHLAtx4Ve2xSmgPSmkEgEysYdk9BKCTpejJyg78` | Keypair prepared (offline) |
+| `ngo-frugal.lifeline-demo.testnet` | Responder NGO #3 (stake, place_bid, submit_proof) | `FullAccess` | `register_ngo`, `place_bid`, `submit_proof` | FullAccess | `ed25519:AoK2z3NcacfWVZZdQm8UyxDAQwW8Bd9GFpnhu3RL7xtU` | Keypair prepared (offline) |
+| `coord.lifeline-demo.testnet` | Human tie-break coordinator (human_confirm / human_reject) | `FullAccess` | `human_confirm`, `human_reject` | FullAccess | `ed25519:5zMSwiVJHgNFqyaSCKUuRxGmM1SN2kjuysfKhBe7bjkJ` | Keypair prepared (offline) |
 
 ## Principle of Least Privilege
 

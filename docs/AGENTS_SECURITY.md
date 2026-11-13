@@ -22,10 +22,10 @@
 
 1. **Four Independent Verifier Accounts & Keys (REAL):**
    - `v-geo.lifeline-<sfx>.testnet` (Deterministic cluster & Sybil checks — no LLM)
-   - `v-fact.lifeline-<sfx>.testnet` (External evidence tools + LLM #1 via NEAR AI Cloud: `llama-v3p1-70b-instruct`)
-   - `v-sev.lifeline-<sfx>.testnet` (Severity tier 1–4 proposer + LLM #2 via NEAR AI Cloud: `qwen2p5-72b-instruct`)
-   - `v-red.lifeline-<sfx>.testnet` (Adversarial Red-Team verifier + LLM #3 via secondary provider: `gpt-4o-mini`)
-   - **Honest Operator Disclosure:** In the hackathon demo, our team operates all four verifier keys. The contract architecture enforces separate NEAR accounts and function-call access keys so four separate institutions can operate them in production, though multi-operator deployment has not been tested in production yet.
+   - `v-fact.lifeline-<sfx>.testnet` (External evidence tools + LLM #1 via Groq free-tier OpenAI-compatible API: `llama-3.3-70b-versatile`)
+   - `v-sev.lifeline-<sfx>.testnet` (Severity tier 1–4 proposer + LLM #2 via Groq free-tier OpenAI-compatible API: `qwen-qwq-32b`)
+   - `v-red.lifeline-<sfx>.testnet` (Adversarial Red-Team verifier + LLM #3 via Google Gemini AI Studio free-tier OpenAI-compatible API: `gemini-2.5-flash`)
+   - **Honest Operator & Provider Disclosure:** Per Section B.1 #1 of the build plan, we use two distinct open-weight models (`llama-3.3-70b-versatile` and `qwen-qwq-32b`) on Provider #1 (Groq) and a third distinct model (`gemini-2.5-flash`) on a separate Provider #2 (Google AI Studio) so `fact`, `sev`, and `red` run on three genuinely distinct models across two providers at zero cost (and remain drop-in compatible with `https://cloud-api.near.ai/v1`). In the hackathon demo, our team operates all four verifier keys. The contract architecture enforces separate NEAR accounts and function-call access keys so four separate institutions can operate them in production, though multi-operator deployment has not been tested in production yet.
 2. **External Evidence Tools & Replay Fixtures (REAL DATA + DETERMINISTIC REPLAY):**
    - Tools query **Open-Meteo** (historical/forecast precipitation), **GDACS** (disaster alerts), **UN OCHA ReliefWeb** (humanitarian situation reports), and **USGS** (seismic feed).
    - `live` mode queries the live public APIs and LLM endpoints.

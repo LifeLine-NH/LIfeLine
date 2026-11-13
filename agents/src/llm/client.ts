@@ -17,29 +17,33 @@ export interface LlmModelConfig {
 }
 
 export function getModelConfigForRole(role: LlmAgentRole): LlmModelConfig {
-  const nearBaseUrl = process.env.NEAR_AI_BASE_URL ?? "https://api.near.ai/v1";
-  const nearApiKey = process.env.NEAR_AI_API_KEY ?? "";
-  const secondaryBaseUrl = process.env.SECONDARY_LLM_BASE_URL ?? "https://api.openai.com/v1";
-  const secondaryApiKey = process.env.SECONDARY_LLM_API_KEY ?? "";
+  const primaryBaseUrl =
+    process.env.NEAR_AI_BASE_URL ??
+    process.env.GROQ_BASE_URL ??
+    "https://api.groq.com/openai/v1";
+  const primaryApiKey =
+    process.env.NEAR_AI_API_KEY ?? process.env.GROQ_API_KEY ?? "";
+  const secondaryBaseUrl =
+    process.env.SECONDARY_LLM_BASE_URL ??
+    process.env.GEMINI_BASE_URL ??
+    "https://generativelanguage.googleapis.com/v1beta/openai";
+  const secondaryApiKey =
+    process.env.SECONDARY_LLM_API_KEY ?? process.env.GEMINI_API_KEY ?? "";
 
   switch (role) {
     case "fact":
       return {
         provider: "near-ai-cloud",
-        baseUrl: nearBaseUrl,
-        apiKey: nearApiKey,
-        modelId:
-          process.env.FACT_MODEL_ID ??
-          "fireworks::accounts/fireworks/models/llama-v3p1-70b-instruct"
+        baseUrl: primaryBaseUrl,
+        apiKey: primaryApiKey,
+        modelId: process.env.FACT_MODEL_ID ?? "llama-3.3-70b-versatile"
       };
     case "sev":
       return {
         provider: "near-ai-cloud",
-        baseUrl: nearBaseUrl,
-        apiKey: nearApiKey,
-        modelId:
-          process.env.SEV_MODEL_ID ??
-          "fireworks::accounts/fireworks/models/qwen2p5-72b-instruct"
+        baseUrl: primaryBaseUrl,
+        apiKey: primaryApiKey,
+        modelId: process.env.SEV_MODEL_ID ?? "qwen-qwq-32b"
       };
     case "red":
     case "delivery":
@@ -47,7 +51,7 @@ export function getModelConfigForRole(role: LlmAgentRole): LlmModelConfig {
         provider: "secondary",
         baseUrl: secondaryBaseUrl,
         apiKey: secondaryApiKey,
-        modelId: process.env.RED_MODEL_ID ?? "gpt-4o-mini"
+        modelId: process.env.RED_MODEL_ID ?? "gemini-2.5-flash"
       };
   }
 }

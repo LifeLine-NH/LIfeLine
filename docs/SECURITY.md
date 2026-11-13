@@ -1,8 +1,8 @@
 # Security
 
-What could go wrong, what stops it, and the test that shows it. Agent rows come from developer B ([AGENTS_SECURITY.md](AGENTS_SECURITY.md)), website rows from developer C. Contract rows are listed as planned until the relief contract is in this repository.
+What could go wrong, what stops it, and the test that shows it. Agent rows come from developer B ([AGENTS_SECURITY.md](AGENTS_SECURITY.md)), website rows from developer C, and contract rows from developer A ([CONTRACT.md](CONTRACT.md)).
 
-Run every test named here with `pnpm test` (agents and website) and `pnpm test:e2e` (website on a local NEAR sandbox).
+Run every test named here with `pnpm test` (agents and website), `pnpm test:contracts` (Rust contract unit tests), and `pnpm test:e2e` (NEAR sandbox end-to-end tests).
 
 ## Fake or manipulated reports
 
@@ -46,22 +46,23 @@ Run every test named here with `pnpm test` (agents and website) and `pnpm test:e
 | A responder submits an inflated proof by mistake | The proof form warns when households reached are far from the plan, using the same ratio the delivery verifiers reject. | `web/lib/ngo/actions.test.ts` |
 | The public Run button floods the chain with transactions | One run at a time with a short pause between runs. Runs are switched off on mainnet. | Checked by hand (two quick requests return 429). |
 
-## Relief contract (planned, developer A)
+## Relief contract (developer A)
 
-These come from the contract plan and are not in this repository yet.
+Implemented in [`contracts/lifeline`](../contracts/lifeline/src/lib.rs) and verified with Rust unit tests (`pnpm test:contracts`) and local NEAR sandbox end-to-end tests (`pnpm test:e2e`, `web/e2e/lifeline.e2e.test.ts`).
 
-| Threat | Planned mitigation |
-|---|---|
-| A leaked verifier key spends money | Verifier keys are function call keys limited to `vote` and `vote_delivery`. They cannot attach deposits. |
-| One verifier votes twice or for another role | One vote per role per case, checked by the contract. |
-| A case drains the pool | Cap is the lowest of the tier limit, a share of the available pool and what is left of the daily limit. Bids above the cap are rejected. |
-| A winner never delivers | Proof deadline. After it, the rest of the escrow returns to the pool and the NGO's reputation drops. Their bond is the deterrent for the first payment, which stays paid. |
-| Votes split | No money moves. A registered coordinator confirms or rejects the case. |
+| Threat | Mitigation | Test |
+|---|---|---|
+| A leaked verifier or intake key spends money | Restricted `FunctionCall` access keys created in `scripts/create-accounts.ts`: `0` NEAR allowance, scoped strictly to `vote`/`vote_delivery` (verifiers) and `submit_case` (intake). | `restricted FunctionCall keys cannot call admin methods or attach deposits` (`web/e2e/lifeline.e2e.test.ts`) |
+| One verifier votes twice or for another role | One vote per role per case (`vote`) and per proof round (`vote_delivery`), enforced on-chain by registered role check. | `contracts/lifeline` unit tests & `negative security checks` (`web/e2e/lifeline.e2e.test.ts`) |
+| A case drains the pool | Cap is the lowest of the tier limit, `max_case_bps` of available pool, and remaining `daily_limit`. Bids above the cap are rejected. | `cap governor` unit tests & `web/e2e/lifeline.e2e.test.ts` |
+| Failed payout permanently loses escrowed tokens | `on_tranche1_transfer` and `on_tranche2_transfer` roll back `pool_balance`, `pool_reserved`, `disbursed_today`, and case state on failed `ft_transfer`; `payout_pending` guards against concurrent state mutation. | `tranche 1 failed ft_transfer triggers on_tranche1_transfer rollback` (`web/e2e/lifeline.e2e.test.ts`) |
+| A winner never delivers | Proof deadline (`expire`) releases unspent `pool_reserved` back to `available` and drops the NGO's reputation. `register_ngo` bond acts as deterrent for Tranche 1. | `S5 proof deadline expiry` (`web/e2e/lifeline.e2e.test.ts`) & `contracts/lifeline` unit tests |
+| Votes split | No money moves until a registered coordinator executes `human_confirm` or `human_reject`. | `S3` split-vote scenario (`web/e2e/lifeline.e2e.test.ts`) |
 
 ## Known limits
 
 - **One team runs all four verifiers in the demo.** Separate accounts and keys make separate operators possible, but we have not run it that way.
 - **Replay inputs are written for the demo.** The outside data in `agents/fixtures/` and the model answers in `agents/recordings/` are not captured from the real sources. For example, the S1 rainfall figures do not match the Open-Meteo archive for those dates. Live mode calls the real APIs and models.
-- **The relief contract is not deployed**, so every mitigation in the contract table above is a design, not a tested fact.
+- **Live testnet deployment has not been broadcast yet.** All contract mitigations are verified on `near-workspaces` local NEAR sandbox (`pnpm test:e2e`) and Rust unit tests (`pnpm test:contracts`); broadcasting to NEAR testnet requires running `scripts/create-accounts.ts` and `scripts/deploy-testnet.ts` with a funded `NEAR_OWNER_PRIVATE_KEY`.
 - **The first payment cannot be clawed back.** If a winner takes it and never delivers, only the bond and reputation penalty apply.
 - **Evidence written by fresh runs** is stored on the server's disk. On hosting with temporary disks, a record from a fresh run may not be available later, so its hash check can fail to download it.

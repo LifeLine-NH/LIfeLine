@@ -1,0 +1,14 @@
+[package]
+name = "lifeline"
+version = "0.1.0"
+edition = "2021"
+description = "LIFELINE disaster relief pool, verifier swarm quorum, cap governor, and two-tranche escrow contract on NEAR"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = { version = "=5.5.0", default-features = false }
+
+[dev-dependencies]
+near-sdk = { version = "=5.5.0", default-features = false, features = ["unit-testing"] }

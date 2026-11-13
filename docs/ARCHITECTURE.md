@@ -58,9 +58,10 @@ Reports stay off chain to protect the people who sent them. Anyone can download 
 | `/` | What it is, a replay of a funded and a rejected case, the pool, recent cases |
 | `/cases`, `/cases/[id]` | Every case including rejected ones; votes, reasons, timeline, bids, proof, evidence, payout quote |
 | `/donate` | Donate the pool token through a NEAR wallet (NEAR Connect) |
-| `/ngo` | Cases open for bids and how responding works. Registering and bidding from the site wait for the contract. |
+| `/ngo` | Register with a bond, bid on open cases, see your awards and submit proof, all as wallet transactions to the contract. Switched off on sample data. |
 | `/ops`, `/ops/stage` | Run S1, S2, S3, S5 through the agent runner and watch each vote arrive |
 | `/api/evidence/[hash]` | Serves an evidence or vote record by its hash |
+| `/api/evidence` (POST) | Stores an NGO profile, bid plan or proof record and returns its SHA-256, which then goes on chain with the transaction |
 | `/api/swarm/run` | Runs one scenario through `executeSwarmScenario` from the agents package |
 | `/api/payout/quote` | Dry run quote from the NEAR Intents 1Click API |
 

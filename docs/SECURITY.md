@@ -42,6 +42,8 @@ Run every test named here with `pnpm test` (agents and website), `pnpm test:cont
 | Threat | What stops it | Test |
 |---|---|---|
 | A quote request moves real funds | Requests are always `dry: true`, so no deposit address is created. The site refuses a response that isn't marked as a dry run. | `web/lib/intents/quote.test.ts` |
+| Someone fills evidence storage through the public write endpoint | Only three record kinds are accepted, each at most 32 KB, and storage stops at 5,000 records. The browser recomputes the hash and refuses to send a transaction if the server's hash differs. | Checked by hand (bad kind, arrays and oversized records are refused) |
+| A responder submits an inflated proof by mistake | The proof form warns when households reached are far from the plan, using the same ratio the delivery verifiers reject. | `web/lib/ngo/actions.test.ts` |
 | The public Run button floods the chain with transactions | One run at a time with a short pause between runs. Runs are switched off on mainnet. | Checked by hand (two quick requests return 429). |
 
 ## Relief contract (developer A)

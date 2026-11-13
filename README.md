@@ -11,9 +11,10 @@ Built at NEAR HACKATHON 2026 for the **AI Swarms** and **Open Innovation** track
 | Part | State |
 |---|---|
 | Verifier swarm, intake, simulated NGO bidders (`agents/`) | Working. Runs all four demo scenarios offline with no keys. 34 tests. |
-| Web app (`web/`) | Working on sample data and on B's runner. Donate and full relief lifecycle tested end to end on a local NEAR sandbox. 64 unit tests, 14 sandbox tests. |
+| Web app (`web/`) | Working on sample data and on B's runner. Donate flow tested end to end on a local NEAR sandbox. 74 unit tests, 8 sandbox tests. |
 | NEAR Intents payout quotes | Working. Live dry quotes from the 1Click API on mainnet. Sending the payout is not built. |
-| Relief contract & mock FT (`contracts/`) | Working. Rust contracts implemented and verified with 16 unit tests and 6 dedicated contract sandbox E2E tests. Testnet deployment scripted in `scripts/`. |
+| NGO register, bid and proof forms, coordinator confirm and reject | Built. Switched off until the site points at a deployed relief contract. |
+| Relief contract | Not in this repository yet. Not deployed to testnet. |
 | Hosted demo | Not deployed yet. |
 
 Until the contract is deployed to testnet, the website runs on **sample data** and says so in the header on every page.
@@ -80,9 +81,8 @@ Then open http://localhost:3000. The first start compiles the agents package and
 ### 3. Run the tests
 
 ```bash
-pnpm test            # agents (34) and web unit tests (64)
-pnpm test:contracts  # Rust contract unit tests (13 lifeline + 3 mock-ft = 16)
-pnpm test:e2e        # donate (8) and lifeline contract lifecycle (6) on a local NEAR sandbox (14)
+pnpm test        # agents (34) and web unit tests (74)
+pnpm test:e2e    # donate flow on a local NEAR sandbox (8)
 ```
 
 The sandbox tests start a local NEAR node, deploy real `mock_ft.wasm` and `lifeline.wasm` contracts (plus the donate flow fixture), and verify restricted `FunctionCall` keys, donations/refunds, negative security checks, the cap governor, failed payout rollback, full agent scenarios S1–S5, and proof-deadline expiry. The first run downloads the sandbox binary.

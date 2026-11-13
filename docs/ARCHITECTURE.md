@@ -20,13 +20,13 @@ How a disaster report becomes a funded, delivered and checked relief case, and w
 | Role | Account | How it decides | Model |
 |---|---|---|---|
 | Geo | `v-geo` | Plain code: how many independent senders, how spread out in time and place, whether one sender dominates. | None |
-| Fact | `v-fact` | Calls the outside data tools and asks a model to weigh them. Cannot vote yes unless at least two outside sources support the claim. | Llama 3.1 70B through NEAR AI Cloud |
-| Severity | `v-sev` | Proposes a tier from 1 to 4. Tier 1 means no funding. | Qwen 2.5 72B through NEAR AI Cloud |
-| Red team | `v-red` | Tries to prove the report is fake. Looks for instructions hidden in report text and votes no if it finds one. | A third model from another provider |
+| Fact | `v-fact` | Calls the outside data tools and asks a model to weigh them. Cannot vote yes unless at least two outside sources support the claim. | Llama 3.3 70B (default provider: Groq) |
+| Severity | `v-sev` | Proposes a tier from 1 to 4. Tier 1 means no funding. | Qwen QwQ 32B (default provider: Groq) |
+| Red team | `v-red` | Tries to prove the report is fake. Looks for instructions hidden in report text and votes no if it finds one. | Gemini 2.5 Flash (Google AI Studio) |
 
 Report text is always treated as data, never as instructions. Every vote is saved as a vote record (verdict, confidence, reasoning, the tool results it used), and the SHA-256 of that record is sent with the vote.
 
-Model names above are the defaults in `agents/src/llm/client.ts` and can be changed with environment variables. In replay mode no model is called.
+Model names above are the defaults in `agents/src/llm/client.ts`. Any OpenAI compatible endpoint can be used instead, including NEAR AI Cloud, by setting `NEAR_AI_BASE_URL` and `NEAR_AI_API_KEY` (or the model id variables). In replay mode no model is called.
 
 ## Case states
 

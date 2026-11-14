@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname, ".."),
   outputFileTracingIncludes: {
     "/api/swarm/run": ["../agents/dist/**", "../agents/scenarios/**", "../agents/recordings/**", "../agents/fixtures/**"],
+    "/api/evidence/[hash]": ["storage/evidence/**"],
+    "/cases/[id]": ["storage/evidence/**"],
+    "/": ["storage/evidence/**"],
   },
   turbopack: {
     rules: {

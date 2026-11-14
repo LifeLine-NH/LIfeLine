@@ -1,0 +1,15 @@
+{
+  "case_id": "s6177-2024-09-10-001-s1",
+  "ngo_name": "NorthEast Community Responders [SIMULATED]",
+  "ngo_account": "ngo-3.test.near",
+  "simulated": true,
+  "strategy": "cheap_frugal",
+  "ask": "3400000000",
+  "eta_hours": 18,
+  "planned_households": 600,
+  "deliverables": [
+    "Emergency clean water purification tablets & jerrycans",
+    "Tarpaulins and dry food rations for displaced households",
+    "Geotagged distribution manifest & photo hashes"
+  ]
+}

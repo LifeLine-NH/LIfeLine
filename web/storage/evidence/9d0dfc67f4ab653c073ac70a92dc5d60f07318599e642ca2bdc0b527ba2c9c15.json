@@ -1,0 +1,19 @@
+{
+  "case_id": "s6177-2024-09-10-001-s5",
+  "ngo_account": "ngo-3.test.near",
+  "summary": "[SIMULATED FRAUDULENT PROOF] Claiming 50,000 households reached in distant LGA with unverifiable manifest.",
+  "households_reached": 50000,
+  "planned_households": 600,
+  "amount_spent": "3400000000",
+  "award_amount": "3400000000",
+  "location": {
+    "lat": 12.6115,
+    "lon": 13.801
+  },
+  "photo_hashes": [
+    "24c48ea568443a6c9f8d413f409ed748902c939fe12ace9fa08b7d7d2bd529fd",
+    "04517ddfd917c2a420103aa939f70184af7f4be51041ba8c36becb74c1e53695"
+  ],
+  "delivered_at": "2024-09-10T08:55:00.000Z",
+  "simulated": true
+}

@@ -1,0 +1,7 @@
+{
+  "case_id": "s6177-2024-09-10-001-s5",
+  "agent": "geo",
+  "model": "deterministic-delivery-v1",
+  "ok": false,
+  "reasoning": "Delivery proof rejected by deterministic checks: delivery GPS is 111858m from case centroid (>5000m max); claimed 50000 households is 8333% of planned 600 (outside 25%-300% plausibility band)."
+}

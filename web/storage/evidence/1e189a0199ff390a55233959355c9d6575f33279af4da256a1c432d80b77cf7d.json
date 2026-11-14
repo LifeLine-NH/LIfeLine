@@ -1,0 +1,44 @@
+{
+  "case_id": "s6177-2024-09-10-001-s1",
+  "agent": "fact",
+  "model": "openai/gpt-oss-120b (replay)",
+  "verdict": "Yes",
+  "confidence_bps": 9400,
+  "tier": 0,
+  "reasoning": "Claim verified by 3 independent external sources: (1) open-meteo recorded 112.4mm/24h extreme rainfall anomaly, (2) gdacs issued a Red Flood Alert for Maiduguri/Borno State, and (3) reliefweb published UN OCHA Flash Update #1 confirming the Alau Dam breach.",
+  "tool_calls": [
+    {
+      "tool": "open-meteo",
+      "claim": "Severe rainfall anomaly detected: peak 112.4mm/24h (215.1mm cumulative over window)",
+      "supports": "yes",
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=11.83&longitude=13.15&start_date=2024-09-08&end_date=2024-09-10&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+      "retrieved_at": "2024-09-10T06:00:00Z",
+      "raw_hash": "7c868349016505c0528a900f0791112f48630b0c2d440a643733a8f7fb9a3473"
+    },
+    {
+      "tool": "gdacs",
+      "claim": "GDACS Red Alert: Flood in Nigeria (Borno State / Maiduguri) — Extreme flood impact following Alau Dam breach; estimated >200,000 displaced in Maiduguri",
+      "supports": "yes",
+      "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+      "retrieved_at": "2024-09-10T06:00:00Z",
+      "raw_hash": "46400167b56cfbb0f0b00e3bc1257bc4283bbc2740e537c9937abb9f570addfe"
+    },
+    {
+      "tool": "reliefweb",
+      "claim": "ReliefWeb situation report confirmed (1 matches): \"Nigeria: Maiduguri Flash Update #1 - Alau Dam Breach & Severe Flooding (10 Sep 2024)\"",
+      "supports": "yes",
+      "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Maiduguri+flood+2024",
+      "retrieved_at": "2024-09-10T06:00:00Z",
+      "raw_hash": "67aa18d4e7138a062b16de308c2107e383691ae9548a5fe93266c41030b7fea2"
+    },
+    {
+      "tool": "usgs",
+      "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+      "supports": "unclear",
+      "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=11.83&longitude=13.15&maxradiuskm=150&starttime=2024-09-09&endtime=2024-09-11",
+      "retrieved_at": "2024-09-10T06:00:00Z",
+      "raw_hash": "08a27e7cebf7ae3e6a32a6d821c69e56c51094bdb8342e6fff47624393560cef"
+    }
+  ],
+  "attestation": null
+}

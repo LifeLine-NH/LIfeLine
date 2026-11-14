@@ -1,0 +1,44 @@
+{
+  "case_id": "s4nh7-2025-01-15-001-s2",
+  "agent": "sev",
+  "model": "qwen/qwen3.8-27b (replay)",
+  "verdict": "No",
+  "confidence_bps": 9500,
+  "tier": 1,
+  "reasoning": "Assigning Severity Tier 1 (No Funding): Despite 12 reports demanding Tier 4 flood funds, Open-Meteo shows 0.0mm precipitation and GDACS/ReliefWeb show zero alerts.",
+  "tool_calls": [
+    {
+      "tool": "open-meteo",
+      "claim": "No significant rainfall: 0mm total precipitation recorded over window (dry conditions)",
+      "supports": "no",
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=12.00&longitude=8.59&start_date=2025-01-13&end_date=2025-01-15&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+      "retrieved_at": "2025-01-15T10:20:00Z",
+      "raw_hash": "b3b3e87d50f66e4e2e1c82f0db0103d278ec5d1ccdaaf4895d49c67117273f12"
+    },
+    {
+      "tool": "gdacs",
+      "claim": "No active GDACS disaster alert found in region/window",
+      "supports": "no",
+      "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+      "retrieved_at": "2025-01-15T10:20:00Z",
+      "raw_hash": "9c2bf49b03ff33035287858cbaa6e01037b4753b749adc4003543351fb194d3e"
+    },
+    {
+      "tool": "reliefweb",
+      "claim": "No corroborating UN OCHA ReliefWeb situation reports found for region/window",
+      "supports": "no",
+      "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Kano+flood+2025-01",
+      "retrieved_at": "2025-01-15T10:20:00Z",
+      "raw_hash": "931891f15ce578ec8e7b3a67df345e3629c0139aac71931d335f7c86c95f5f3d"
+    },
+    {
+      "tool": "usgs",
+      "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+      "supports": "unclear",
+      "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=12.00&longitude=8.59&maxradiuskm=150&starttime=2025-01-14&endtime=2025-01-16",
+      "retrieved_at": "2025-01-15T10:20:00Z",
+      "raw_hash": "950dd6275b8b080e3db1776fa209d810c6f56dbab81b022a8061ce13faae2fc5"
+    }
+  ],
+  "attestation": null
+}

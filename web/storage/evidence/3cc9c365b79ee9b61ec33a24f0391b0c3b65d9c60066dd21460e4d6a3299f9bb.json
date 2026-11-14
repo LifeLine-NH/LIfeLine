@@ -1,0 +1,7 @@
+{
+  "case_id": "s6177-2024-09-10-002-s1",
+  "agent": "sev",
+  "model": "openai/gpt-oss-20b (replay)",
+  "ok": true,
+  "reasoning": "Delivery proof verified: GPS coordinates are within 150m of the Maiduguri case centroid, 585 households reached matches the 600 planned households (97.5%), and 2 SHA-256 geotagged photo hashes are present."
+}

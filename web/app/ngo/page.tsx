@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { BidForm } from "@/components/ngo/BidForm";
@@ -14,6 +15,8 @@ import { formatAmount, incidentLabel, nanosToMs, percent } from "@/lib/format";
 import { RULES } from "@/lib/rules";
 import { config } from "@/lib/config";
 import type { EvidenceBundle } from "@/lib/types";
+
+export const metadata: Metadata = { title: "NGOs · LifeLine" };
 
 async function OpenForBids() {
   const res = await attempt(async () => {

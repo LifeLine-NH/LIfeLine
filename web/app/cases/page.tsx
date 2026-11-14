@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CaseTable } from "@/components/case/CaseRows";
@@ -7,6 +8,8 @@ import { attempt } from "@/lib/attempt";
 import { listCaseRows } from "@/lib/caseList";
 import { config } from "@/lib/config";
 import type { CaseStatus } from "@/lib/types";
+
+export const metadata: Metadata = { title: "Cases · LifeLine" };
 
 const FILTERS: { key: string; label: string; status?: CaseStatus }[] = [
   { key: "all", label: "All" },

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CoordinatorButtons } from "@/components/ngo/CoordinatorButtons";
@@ -11,6 +12,8 @@ import { chain } from "@/lib/chain";
 import { config } from "@/lib/config";
 import { incidentLabel } from "@/lib/format";
 import { loadRunScripts } from "@/lib/runScript";
+
+export const metadata: Metadata = { title: "Ops · LifeLine" };
 
 async function Console() {
   const res = await attempt(() => loadRunScripts());

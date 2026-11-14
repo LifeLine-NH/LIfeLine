@@ -1,0 +1,15 @@
+{
+  "case_id": "s6177-2024-09-10-001-s5",
+  "ngo_name": "RapidAir Relief Borno [SIMULATED]",
+  "ngo_account": "ngo-1.test.near",
+  "simulated": true,
+  "strategy": "expensive_fast",
+  "ask": "4600000000",
+  "eta_hours": 6,
+  "planned_households": 500,
+  "deliverables": [
+    "Emergency clean water purification tablets & jerrycans",
+    "Tarpaulins and dry food rations for displaced households",
+    "Geotagged distribution manifest & photo hashes"
+  ]
+}

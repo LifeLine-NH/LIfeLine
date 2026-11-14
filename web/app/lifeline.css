@@ -381,6 +381,7 @@ body { margin: 0; }
 .ll .band a.btn-outline { background: transparent; color: #F2F1EC; border-color: #4A4F5A; }
 .ll .band a.btn-outline:hover { border-color: #F2F1EC; color: #fff; }
 @media (max-width: 720px) {
+  .ll { overflow-x: clip; }
   .step-label { display: none; }
   .case-line { grid-template-columns: minmax(0, 1fr) auto; }
   .case-line .c-hide { display: none; }

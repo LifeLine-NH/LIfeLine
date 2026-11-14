@@ -1,0 +1,11 @@
+{
+  "case_id": "s6177-2024-09-10-001-s5",
+  "agent": "geo",
+  "model": "deterministic-cluster-v1",
+  "verdict": "Yes",
+  "confidence_bps": 9100,
+  "tier": 0,
+  "reasoning": "Spatio-temporal cluster verified: source_diversity=4, max single-source share=25.0% (<=40%), radius=291m, window spread=2400s.",
+  "tool_calls": [],
+  "attestation": null
+}

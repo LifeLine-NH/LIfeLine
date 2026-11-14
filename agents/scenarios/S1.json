@@ -1,7 +1,7 @@
 {
   "id": "S1",
-  "name": "Maiduguri Alau Dam Flood (Genuine Replay)",
-  "description": "Replay of the real September 10, 2024 Maiduguri flood in Borno State, NE Nigeria following the Alau Dam spillway failure. Multi-source field reports corroborated by historical precipitation anomaly, GDACS flood alert, and ReliefWeb situation reports.",
+  "name": "Maiduguri Alau Dam Flood (Illustrative replay)",
+  "description": "Illustrative replay modelled on the September 2024 Maiduguri flood in Borno State, NE Nigeria, which followed the Alau Dam failure. Recorded inputs (field reports, rainfall, GDACS alert, ReliefWeb reports) were written for this scenario and are not copies of real API output.",
   "incident_type": "flood",
   "requested_tier": 3,
   "expected_verification_status": "Bidding",

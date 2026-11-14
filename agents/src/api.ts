@@ -27,7 +27,8 @@ export const SwarmRunRequestSchema = z.object({
   includeFullLifecycle: z.boolean().default(true),
   customReports: z.array(RawReportSchema).optional(),
   incidentType: z.enum(["flood", "earthquake", "fire", "cyclone", "other"]).optional(),
-  requestedTier: z.number().int().min(1).max(4).optional()
+  requestedTier: z.number().int().min(1).max(4).optional(),
+  sequence: z.number().int().min(1).optional()
 });
 export type SwarmRunRequest = z.infer<typeof SwarmRunRequestSchema>;
 
@@ -69,7 +70,8 @@ export async function executeSwarmScenario(
   const [built] = ingestReportsToBundles(reports, {
     incidentType,
     requestedTier,
-    mode
+    mode,
+    sequence: parsedReq.sequence
   });
 
   // Make case_id unique per scenario run so S1 and S5 can run on the same contract instance without collision

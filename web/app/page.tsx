@@ -88,6 +88,9 @@ async function Hero() {
             </span>
             <span>{RULES.rejectAtNo} no to reject</span>
             <span>{SAMPLE ? "Sample data: no money moves" : "Every amount links to its record"}</span>
+            <a href="https://github.com/LifeLine-NH/LIfeLine#what-is-real-and-what-is-simulated" target="_blank" rel="noreferrer" style={{ color: "inherit", textDecoration: "underline", textUnderlineOffset: 3 }}>
+              What is simulated
+            </a>
           </p>
         </div>
         {replay.length > 0 ? (
@@ -164,13 +167,15 @@ async function Pool() {
   const p = res.value;
   const href = contractUrl();
   const sym = config.tokenSymbol;
+  // In sample mode the label itself says so, not only the header badge.
+  const s = SAMPLE ? "Sample: " : "";
   return (
     <PoolStats
       figures={[
-        { value: amountToNumber(p.available), decimals: 2, label: `${sym} available for new cases`, note: "Can be reserved by the next verified case", href, sample: SAMPLE },
-        { value: amountToNumber(p.reserved), decimals: 2, label: `${sym} held for awarded cases`, note: "Waiting on proof of delivery", href, sample: SAMPLE },
-        { value: amountToNumber(p.disbursed_today), decimals: 2, label: `${sym} paid out today`, note: "Since 00:00 UTC", href, sample: SAMPLE },
-        { value: p.donors_count, decimals: 0, label: "Donors", note: "Distinct accounts since launch", href, sample: SAMPLE },
+        { value: amountToNumber(p.available), decimals: 2, label: `${s}${sym} available for new cases`, note: "Can be reserved by the next verified case", href, sample: SAMPLE },
+        { value: amountToNumber(p.reserved), decimals: 2, label: `${s}${sym} held for awarded cases`, note: "Waiting on proof of delivery", href, sample: SAMPLE },
+        { value: amountToNumber(p.disbursed_today), decimals: 2, label: `${s}${sym} paid out today`, note: "Since 00:00 UTC", href, sample: SAMPLE },
+        { value: p.donors_count, decimals: 0, label: SAMPLE ? "Sample: donors" : "Donors", note: "Distinct accounts since launch", href, sample: SAMPLE },
       ]}
     />
   );
@@ -199,7 +204,7 @@ export default function Home() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="flex flex-col gap-2">
               <span className="eyebrow">{SAMPLE ? "Relief pool, sample data" : "Relief pool, live from the contract"}</span>
-              <h2 className="h1">Where the money is right now</h2>
+              <h2 className="h1">{SAMPLE ? "Where the money would be" : "Where the money is right now"}</h2>
             </div>
             <Link className="rec" href="/donate" style={{ fontSize: 15 }}>
               Add to the pool

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { contractUrl, SourceAmount } from "@/components/ui/links";
 import { SectionError } from "@/components/ui/PageError";
@@ -7,6 +8,8 @@ import { chain } from "@/lib/chain";
 import { TimeAgo } from "@/components/ui/TimeAgo";
 import { formatAmount, shortAccount } from "@/lib/format";
 import { DonateForm } from "./DonateForm";
+
+export const metadata: Metadata = { title: "Donate · LifeLine" };
 
 async function RecentDonations() {
   const res = await attempt(() => chain.getDonations(0, 20));

@@ -1,0 +1,15 @@
+{
+  "case_id": "s6177-2024-09-10-001-s5",
+  "ngo_name": "Sahel WASH & Shelter Coalition [SIMULATED]",
+  "ngo_account": "ngo-balanced.lifeline-demo.testnet",
+  "simulated": true,
+  "strategy": "balanced",
+  "ask": "4000000000",
+  "eta_hours": 14,
+  "planned_households": 550,
+  "deliverables": [
+    "Emergency clean water purification tablets & jerrycans",
+    "Tarpaulins and dry food rations for displaced households",
+    "Geotagged distribution manifest & photo hashes"
+  ]
+}

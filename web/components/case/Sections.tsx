@@ -288,15 +288,22 @@ export function EvidenceSection({ c, bundle }: { c: Case; bundle: EvidenceBundle
                           {e.tool}
                         </span>
                         <span className="body-s">{e.claim}</span>
-                        {config.chainMode === "stub" ? (
-                          <span className="rec-off">
-                            <span className="src-sample">Source</span>
-                          </span>
-                        ) : (
-                          <a className="rec" href={e.url} target="_blank" rel="noreferrer">
-                            Source
-                          </a>
-                        )}
+                        <span className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                          {config.chainMode !== "stub" && bundle.mode === "replay" && (
+                            <span className="tag" title="Replay mode: this result is a recorded input written for the scenario, not a fresh call to the source.">
+                              Recorded input
+                            </span>
+                          )}
+                          {config.chainMode === "stub" ? (
+                            <span className="rec-off">
+                              <span className="src-sample">Source</span>
+                            </span>
+                          ) : (
+                            <a className="rec" href={e.url} target="_blank" rel="noreferrer">
+                              Source
+                            </a>
+                          )}
+                        </span>
                       </div>
                       <VerdictMark verdict={e.supports === "yes" ? "Yes" : e.supports === "no" ? "No" : "Abstain"}>
                         {e.supports === "yes" ? "Supports" : e.supports === "no" ? "Contradicts" : "Unclear"}

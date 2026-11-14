@@ -1,0 +1,19 @@
+{
+  "case_id": "s6177-2024-09-10-002-s1",
+  "ngo_account": "ngo-frugal.lifeline-demo.testnet",
+  "summary": "[SIMULATED VALID PROOF] NorthEast Community Responders [SIMULATED] completed distribution of WASH kits, tarpaulins, and dry rations to 585 displaced households in Maiduguri.",
+  "households_reached": 585,
+  "planned_households": 600,
+  "amount_spent": "3400000000",
+  "award_amount": "3400000000",
+  "location": {
+    "lat": 11.8324,
+    "lon": 13.1504
+  },
+  "photo_hashes": [
+    "fc3da72c2a44162446c6dd9f513d68e06c8eefa5bda1fceb65c979ddecbdcea2",
+    "ec1ef8f8d27ac48f0c80da1ae2828f2afb76e505f092331966f34106b483b1e1"
+  ],
+  "delivered_at": "2024-09-10T09:05:00.000Z",
+  "simulated": true
+}

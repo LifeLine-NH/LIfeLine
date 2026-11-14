@@ -1,0 +1,11 @@
+{
+  "case_id": "s1t7d-2025-02-01-001-s3",
+  "agent": "geo",
+  "model": "deterministic-cluster-v1",
+  "verdict": "No",
+  "confidence_bps": 9700,
+  "tier": 0,
+  "reasoning": "Sybil / single-source concentration detected: top source accounts for 100.0% of all 30 reports (source_diversity=1, threshold >=80% rejects).",
+  "tool_calls": [],
+  "attestation": null
+}

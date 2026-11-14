@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { AutoRefresh } from "@/components/AutoRefresh";
+import { CaseActions, type HashTarget } from "@/components/case/CaseActions";
 import { ExplanationCard } from "@/components/case/Explanation";
 import { QuorumSeal } from "@/components/case/QuorumSeal";
 import { BidsSection, EvidenceSection, PayoutPreview, ProofSection } from "@/components/case/Sections";
@@ -42,6 +44,20 @@ function tierLabel(c: Case): string {
   return c.requested_tier > 0 ? `Tier ${c.requested_tier} requested, not set` : "Tier not set";
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const decoded = decodeURIComponent(id);
+  try {
+    const c = await chain.getCase(decoded);
+    if (!c) return { title: `Case ${decoded} · LifeLine` };
+    const bundle = (await getEvidence(c.bundle_hash).catch(() => null)) as EvidenceBundle | null;
+    const incident = bundle?.incident_type ? incidentLabel[bundle.incident_type] : "Incident";
+    return { title: `${headline(c, incident)} · LifeLine` };
+  } catch {
+    return { title: `Case ${decoded} · LifeLine` };
+  }
+}
+
 async function CaseFile({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const res = await attempt(async () => {
@@ -69,6 +85,12 @@ async function CaseFile({ params }: { params: Promise<{ id: string }> }) {
   const path = trail(c, votes, bids, delivery, bundle);
   const live = isLive(c);
   const sources = bundle ? new Set(bundle.reports.map((r) => r.source_id_hash)).size : null;
+  const hashTargets: HashTarget[] = [
+    { label: "Evidence bundle", hash: c.bundle_hash },
+    ...votes.map((v) => ({ label: `${v.role} vote`, hash: v.evidence_hash })),
+    ...(c.proof_hash ? [{ label: "Delivery proof", hash: c.proof_hash }] : []),
+    ...delivery.map((d) => ({ label: `${d.role} delivery vote`, hash: d.evidence_hash })),
+  ];
 
   return (
     <>
@@ -102,6 +124,10 @@ async function CaseFile({ params }: { params: Promise<{ id: string }> }) {
               <h1 className="display" style={{ fontSize: "clamp(36px, 5vw, 56px)" }}>
                 {headline(c, incident)}
               </h1>
+              <p className="body-s" style={{ color: "var(--ink-2)", fontWeight: 550 }}>
+                {ex.title}
+              </p>
+              <CaseActions hashes={hashTargets} />
               <dl className="m-0 grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(150px, 100%), 1fr))" }}>
                 <div>
                   <dt className="cap">Case id</dt>

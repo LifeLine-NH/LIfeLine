@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   callStructuredLlm,
   getModelConfigForRole,
-  LlmVoteOutputSchema
+  LlmVoteOutputSchema,
+  providerFromBaseUrl
 } from "../src/llm/client.js";
 
 describe("LLM Client — Schema Validation, Retry-Once, and Abstain Fallback (B.1 #3 & #4)", () => {
@@ -13,8 +14,17 @@ describe("LLM Client — Schema Validation, Retry-Once, and Abstain Fallback (B.
 
     expect(factCfg.modelId).not.toBe(sevCfg.modelId);
     expect(sevCfg.modelId).not.toBe(redCfg.modelId);
-    expect(factCfg.provider).toBe("near-ai-cloud");
-    expect(redCfg.provider).toBe("secondary");
+    expect(factCfg.slot).toBe("primary");
+    expect(redCfg.slot).toBe("secondary");
+  });
+
+  it("derives the provider label from the base URL host", () => {
+    expect(providerFromBaseUrl("https://api.groq.com/openai/v1")).toBe("groq");
+    expect(providerFromBaseUrl("https://generativelanguage.googleapis.com/v1beta/openai")).toBe("google-ai-studio");
+    expect(providerFromBaseUrl("https://cloud-api.near.ai/v1")).toBe("near-ai-cloud");
+    expect(providerFromBaseUrl("https://llm.example.org/v1")).toBe("llm.example.org");
+    expect(providerFromBaseUrl("not a url")).toBe("unknown");
+    expect(getModelConfigForRole("fact").provider).toBe(providerFromBaseUrl(getModelConfigForRole("fact").baseUrl));
   });
 
   it("retries once when attempt 1 returns garbage JSON and succeeds when attempt 2 returns valid JSON", async () => {

@@ -1,0 +1,44 @@
+{
+  "case_id": "s1t7d-2025-02-01-001-s3",
+  "agent": "fact",
+  "model": "openai/gpt-oss-120b (replay)",
+  "verdict": "No",
+  "confidence_bps": 9500,
+  "tier": 0,
+  "reasoning": "Claim contradicted by external tools: Open-Meteo recorded only 0.2mm precipitation (dry conditions) and neither GDACS nor ReliefWeb has any flood alert or report for the area.",
+  "tool_calls": [
+    {
+      "tool": "open-meteo",
+      "claim": "No significant rainfall: 0.2mm total precipitation recorded over window (dry conditions)",
+      "supports": "no",
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=9.06&longitude=7.50&start_date=2025-01-30&end_date=2025-02-01&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+      "retrieved_at": "2025-02-01T12:10:00Z",
+      "raw_hash": "e432bae881245fd8be619a73353913a167ea7e9fa50fb44d4fa2b9d891cde0b7"
+    },
+    {
+      "tool": "gdacs",
+      "claim": "No active GDACS disaster alert found in region/window",
+      "supports": "no",
+      "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+      "retrieved_at": "2025-02-01T12:10:00Z",
+      "raw_hash": "7a6178a0e78d787a9eff2accb73d3f2a806095a019b6de9d247074d1d672ff6d"
+    },
+    {
+      "tool": "reliefweb",
+      "claim": "No corroborating UN OCHA ReliefWeb situation reports found for region/window",
+      "supports": "no",
+      "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Abuja+flood+2025-02",
+      "retrieved_at": "2025-02-01T12:10:00Z",
+      "raw_hash": "44acf7039f7125770dc3d5e6f9fb2566795913d901463e9a2ae4aa278bef4f05"
+    },
+    {
+      "tool": "usgs",
+      "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+      "supports": "unclear",
+      "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=9.06&longitude=7.50&maxradiuskm=150&starttime=2025-01-31&endtime=2025-02-02",
+      "retrieved_at": "2025-02-01T12:10:00Z",
+      "raw_hash": "753cb899c39e366123ee7c5c96e75a560b00474ddb0465049d9c95fe8ec21707"
+    }
+  ],
+  "attestation": null
+}

@@ -1,0 +1,7 @@
+{
+  "case_id": "s6177-2024-09-10-001-s1",
+  "agent": "geo",
+  "model": "deterministic-delivery-v1",
+  "ok": true,
+  "reasoning": "Delivery geometry & quantities verified: GPS 159m from centroid (<=5km), 585/600 households (98%), 2 photo hashes attached."
+}

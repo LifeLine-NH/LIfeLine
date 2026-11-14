@@ -26,4 +26,9 @@ agents/storage/
 lifeline-design-handoff.zip
 
 # Evidence written by the agent runner when it runs inside the web app
-web/storage/
+# (keep committed testnet run records in web/storage/evidence/)
+web/storage/*
+!web/storage/evidence/
+.vercel
+.env*
+!.env.example

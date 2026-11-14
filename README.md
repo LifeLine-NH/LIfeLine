@@ -6,7 +6,11 @@ People and NGOs donate to one shared pool. Field reports about a disaster (SMS r
 
 Built at NEAR HACKATHON 2026 for the **AI Swarms** and **Open Innovation** tracks.
 
-## Status (12 Nov 2026)
+> **60-second path:**
+> 1. Open the hosted demo: https://lifeline-relief.vercel.app
+> 2. Or run offline locally: `pnpm install && pnpm demo:replay && pnpm dev`
+
+## Status (14 Nov 2026)
 
 | Part | State |
 |---|---|
@@ -15,13 +19,15 @@ Built at NEAR HACKATHON 2026 for the **AI Swarms** and **Open Innovation** track
 | NEAR Intents payout quotes | Working. Live dry quotes from the 1Click API on mainnet. Sending the payout is not built. |
 | NGO register, bid and proof forms, coordinator confirm and reject | Built. Switched off until the site is pointed at `lifeline-demo.testnet` (`NEXT_PUBLIC_CONTRACT_ID`). |
 | Relief contract & mock FT (`contracts/`) | Deployed live on NEAR Testnet (`lifeline-demo.testnet` & `usdc.lifeline-demo.testnet`, `$100,000` pool seeded). 16 Rust unit tests + 6 contract sandbox E2E tests. |
-| Hosted demo | Not deployed yet. |
+| Hosted demo | Live at https://lifeline-relief.vercel.app. The header badge on every page says whether it is showing sample data or the testnet contract. |
 
-Until the website env points at `lifeline-demo.testnet` (`CHAIN_MODE=testnet`), the website runs on **sample data** and says so in the header on every page.
+The website reads **`NEXT_PUBLIC_CHAIN_MODE`**; the agent runner reads **`CHAIN_MODE`**. Until both are set to `testnet` (and the site is rebuilt, because `NEXT_PUBLIC_*` values are baked in at build time), the website runs on **sample data** and says so in the header on every page.
 
 ## Quick start for judges
 
-You need Node.js 20.9 or newer and pnpm 10.
+**Fastest:** open the hosted demo at https://lifeline-relief.vercel.app. No wallet is needed to read cases, votes and evidence.
+
+To run it yourself you need Node.js 20.9 or newer and pnpm 10. The first `pnpm install` also downloads the NEAR sandbox binary used by the end-to-end tests.
 
 ```bash
 git clone https://github.com/LifeLine-NH/LIfeLine.git
@@ -58,7 +64,7 @@ pnpm swarm:run --scenario S2
 
 | Scenario | What it tests | Outcome |
 |---|---|---|
-| S1 Genuine report | Modelled on the September 2024 Alau Dam flood in Maiduguri, Nigeria | Funded, delivered, both payments made |
+| S1 Illustrative replay | Modelled on the September 2024 Alau Dam flood in Maiduguri, Nigeria, with recorded inputs written for the scenario | Funded, delivered, both payments made |
 | S2 Keyword attack | Reports repeat "flood" with no outside evidence, and one hides an instruction to the verifiers | Rejected |
 | S3 Flood of fakes | Thirty reports from one sender in a few minutes | Rejected |
 | S5 Inflated proof | The winning NGO claims 50,000 households against a plan of 600 | Funded, but the second payment is withheld |
@@ -98,25 +104,14 @@ See [docs/ACCOUNTS.md](docs/ACCOUNTS.md), [docs/CONTRACT.md](docs/CONTRACT.md), 
 
 ## How it works
 
-```
- field reports ──► intake: cluster by place and time, hash sender ids, build the evidence bundle
-                        │  bundle stored off chain, its SHA-256 goes on chain
-                        ▼
-              four verifiers, four NEAR accounts
-              Geo (no AI) · Fact (outside data + model) · Severity (model) · Red team (model)
-                        │  each signs its own vote
-                        ▼
-              relief contract: 3 yes funds, 2 no rejects, otherwise a person decides
-              cap = lowest of tier limit, share of pool, daily limit left
-                        │
-                        ▼
-              NGOs bid ──► winner gets the first payment ──► proof of delivery
-                        │
-                        ▼
-              verifiers check the proof (2 of 4) ──► second payment
-                        │
-                        ▼
-              optional: payout as another asset on another chain through NEAR Intents
+```mermaid
+flowchart LR
+  R["Field reports<br/>(SMS, partner, web)"] --> I["Intake<br/>cluster + hash sender IDs"]
+  I -->|SHA-256 on chain| V["4 Verifiers (4 NEAR accounts)<br/>Geo · Fact · Severity · Red team"]
+  V -->|3 Yes funds / 2 No rejects| C["Relief Contract<br/>cap = min(tier, pool%, daily left)"]
+  C --> B["NGOs bid<br/>lowest ask under cap wins"]
+  B -->|Tranche 1 (40%)| D["Proof of delivery"]
+  D -->|2 of 4 verifiers agree| P["Tranche 2 (60%)<br/>optional NEAR Intents quote"]
 ```
 
 More detail, including the case states and what is stored where: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
@@ -124,7 +119,7 @@ More detail, including the case states and what is stored where: [docs/ARCHITECT
 ## Track fit: AI Swarms
 
 - **Independent agents with their own accounts.** Each verifier signs as its own NEAR account (`v-geo`, `v-fact`, `v-sev`, `v-red`). No agent can vote for another. See `agents/src/verifiers/` and `agents/src/chain/client.ts`.
-- **Different kinds of agent on purpose.** Geo is plain code with no AI. Fact and Severity use two different models. The red team uses a third model from another provider and is told to find the reason the report is fake.
+- **Different kinds of agent on purpose.** Geo is plain code with no AI. Fact (`openai/gpt-oss-120b`) and Severity (`qwen/qwen3.8-27b`) use two different models. The red team uses a third model (`openai/gpt-oss-20b`) and is told to find the reason the report is fake. In our demo configuration all three models run on Groq, and Fact and Red are from the same model family (gpt-oss). What limits that shared-provider risk: Geo is a deterministic check with no model, the red team has an adversarial prompt, and a case needs 3 of 4 yes votes to fund. Setting `SECONDARY_LLM_*` moves the red team to a second provider. Each vote record names the exact model that produced it.
 - **Coordination through shared state, not messages.** Agents never talk to each other. They each read the case and vote; the contract counts the votes and decides. See `agents/src/orchestrator/`.
 - **A market of responder agents.** Simulated NGO agents bid on verified cases, and the lowest ask under the cap wins. See `agents/src/ngo/bidders.ts`.
 - **Agents check the outcome, not only the request.** After delivery the swarm votes again on the proof, and the second payment depends on that vote (S5).
@@ -143,7 +138,7 @@ Most aid systems ask donors to trust the operator. LifeLine replaces that trust 
 | Model answers in replay mode (`agents/recordings/`) | Fixed answers written for the demo, so the replay runs with no keys. Live mode calls the models. |
 | NGO bidders | Simulated. Three bots, labelled "Simulated" everywhere they appear on the website. |
 | Relief contract and its rules | Deployed live on NEAR Testnet (`lifeline-demo.testnet`, `usdc.lifeline-demo.testnet`), implemented in `contracts/lifeline` and `contracts/mock-ft`, verified with 16 Rust unit tests and 6 NEAR sandbox E2E tests (14 total with donate E2E). Offline runs use an in-memory version of the rules inside `agents/src/chain/client.ts`. |
-| Cases, pool figures and donations on the website | Live testnet contract `lifeline-demo.testnet` is seeded (`100,000` test USDC); when the website is run without `CHAIN_MODE=testnet`, numbers show a "sample" tag in place of a transaction link. |
+| Cases, pool figures and donations on the website | Live testnet contract `lifeline-demo.testnet` is seeded (`100,000` test USDC); when the website is built without `NEXT_PUBLIC_CHAIN_MODE=testnet`, numbers show a "sample" tag in place of a transaction link. |
 | NEAR Intents quotes | Real, live from the 1Click API on mainnet, as dry runs. Sending a payout this way is not built. |
 | Donate flow | Real transactions, verified on NEAR Testnet during pool seeding (`ft_transfer_call` on `usdc.lifeline-demo.testnet` -> `lifeline-demo.testnet`) and covered by the 14 local NEAR sandbox tests. |
 

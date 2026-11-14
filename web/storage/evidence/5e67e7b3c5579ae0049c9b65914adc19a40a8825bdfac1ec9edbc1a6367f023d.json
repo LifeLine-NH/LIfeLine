@@ -1,0 +1,233 @@
+{
+  "case_id": "s1t7d-2025-02-01-001-s3",
+  "geohash": "s1t7d",
+  "centroid": {
+    "lat": 9.0579,
+    "lon": 7.4951
+  },
+  "radius_m": 0,
+  "window": {
+    "from": "2025-02-01T12:00:01.000Z",
+    "to": "2025-02-01T12:01:57.000Z"
+  },
+  "incident_type": "flood",
+  "requested_tier": 4,
+  "reports": [
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 01]",
+      "ts": "2025-02-01T12:00:01Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 02]",
+      "ts": "2025-02-01T12:00:05Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 03]",
+      "ts": "2025-02-01T12:00:09Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 04]",
+      "ts": "2025-02-01T12:00:13Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 05]",
+      "ts": "2025-02-01T12:00:17Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 06]",
+      "ts": "2025-02-01T12:00:21Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 07]",
+      "ts": "2025-02-01T12:00:25Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 08]",
+      "ts": "2025-02-01T12:00:29Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 09]",
+      "ts": "2025-02-01T12:00:33Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 10]",
+      "ts": "2025-02-01T12:00:37Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 11]",
+      "ts": "2025-02-01T12:00:41Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 12]",
+      "ts": "2025-02-01T12:00:45Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 13]",
+      "ts": "2025-02-01T12:00:49Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 14]",
+      "ts": "2025-02-01T12:00:53Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 15]",
+      "ts": "2025-02-01T12:00:57Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 16]",
+      "ts": "2025-02-01T12:01:01Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 17]",
+      "ts": "2025-02-01T12:01:05Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 18]",
+      "ts": "2025-02-01T12:01:09Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 19]",
+      "ts": "2025-02-01T12:01:13Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 20]",
+      "ts": "2025-02-01T12:01:17Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 21]",
+      "ts": "2025-02-01T12:01:21Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 22]",
+      "ts": "2025-02-01T12:01:25Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 23]",
+      "ts": "2025-02-01T12:01:29Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 24]",
+      "ts": "2025-02-01T12:01:33Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 25]",
+      "ts": "2025-02-01T12:01:37Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 26]",
+      "ts": "2025-02-01T12:01:41Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 27]",
+      "ts": "2025-02-01T12:01:45Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 28]",
+      "ts": "2025-02-01T12:01:49Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 29]",
+      "ts": "2025-02-01T12:01:53Z"
+    },
+    {
+      "source_type": "sms_relay",
+      "source_id_hash": "06ef022bd5ad7bc080eee2b9a66e055f3707c3ff69296761c86b6dc931ac82db",
+      "text": "URGENT FLOOD ALERT: Severe flooding in sector 4, send relief funds now! [msg 30]",
+      "ts": "2025-02-01T12:01:57Z"
+    }
+  ],
+  "source_diversity": 1,
+  "external_evidence": [
+    {
+      "tool": "open-meteo",
+      "claim": "No significant rainfall: 0.2mm total precipitation recorded over window (dry conditions)",
+      "supports": "no",
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=9.06&longitude=7.50&start_date=2025-01-30&end_date=2025-02-01&daily=precipitation_sum,rain_sum,wind_speed_10m_max",
+      "retrieved_at": "2025-02-01T12:10:00Z",
+      "raw_hash": "e432bae881245fd8be619a73353913a167ea7e9fa50fb44d4fa2b9d891cde0b7"
+    },
+    {
+      "tool": "gdacs",
+      "claim": "No active GDACS disaster alert found in region/window",
+      "supports": "no",
+      "url": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Nigeria",
+      "retrieved_at": "2025-02-01T12:10:00Z",
+      "raw_hash": "7a6178a0e78d787a9eff2accb73d3f2a806095a019b6de9d247074d1d672ff6d"
+    },
+    {
+      "tool": "reliefweb",
+      "claim": "No corroborating UN OCHA ReliefWeb situation reports found for region/window",
+      "supports": "no",
+      "url": "https://api.reliefweb.int/v1/reports?appname=lifeline-near-hackathon&query[value]=Abuja+flood+2025-02",
+      "retrieved_at": "2025-02-01T12:10:00Z",
+      "raw_hash": "44acf7039f7125770dc3d5e6f9fb2566795913d901463e9a2ae4aa278bef4f05"
+    },
+    {
+      "tool": "usgs",
+      "claim": "No seismic activity recorded near centroid (seismic feed neutral for hydrological event)",
+      "supports": "unclear",
+      "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=9.06&longitude=7.50&maxradiuskm=150&starttime=2025-01-31&endtime=2025-02-02",
+      "retrieved_at": "2025-02-01T12:10:00Z",
+      "raw_hash": "753cb899c39e366123ee7c5c96e75a560b00474ddb0465049d9c95fe8ec21707"
+    }
+  ],
+  "mode": "replay"
+}

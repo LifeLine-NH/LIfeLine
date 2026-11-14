@@ -2,7 +2,7 @@ import { chain } from "@/lib/chain";
 import { config } from "@/lib/config";
 import { getEvidence } from "@/lib/evidence";
 import { SCENARIOS } from "@/lib/scenarios";
-import { runBlockedReason } from "@/lib/swarm/guard";
+import { nextSequence, runBlockedReason } from "@/lib/swarm/guard";
 import { brokenVerifiers, type ProofSummary, type SwarmTrace, traceToScript } from "@/lib/swarm/trace";
 
 // Runs one demo scenario through B's agent runner: intake, four verifiers, contract decision,
@@ -25,9 +25,11 @@ export async function POST(req: Request) {
   if (!scenario) return Response.json({ error: `Pick one of ${SCENARIOS.map((s) => s.key).join(", ")}.` }, { status: 400 });
   if (config.chainMode === "mainnet") return Response.json({ error: "Scenario runs are off on mainnet." }, { status: 403 });
 
+  let sequence: number | undefined;
   if (config.chainMode !== "stub") {
-    const blocked = await chainBlockedReason(scenario.expect !== "Rejected");
-    if (blocked) return Response.json({ error: blocked }, { status: 429 });
+    const check = await chainCheck(scenario.key, scenario.expect !== "Rejected");
+    if (check.blocked) return Response.json({ error: check.blocked }, { status: 429 });
+    sequence = check.sequence;
   }
 
   if (running || Date.now() < busyUntil) {
@@ -41,6 +43,7 @@ export async function POST(req: Request) {
       mode: config.dataMode,
       chainMode: config.chainMode,
       includeFullLifecycle: true,
+      sequence,
     })) as unknown as SwarmTrace;
 
     const broken = brokenVerifiers(trace);
@@ -65,12 +68,14 @@ export async function POST(req: Request) {
   }
 }
 
-async function chainBlockedReason(funded: boolean): Promise<string | null> {
+async function chainCheck(scenarioKey: string, funded: boolean): Promise<{ blocked: string | null; sequence?: number }> {
   try {
-    const [latest, pool, contractConfig] = await Promise.all([chain.listCases({ limit: 1 }), chain.getPool(), chain.getConfig()]);
-    return runBlockedReason({ nowMs: Date.now(), latestOpenedAtNs: latest[0] ? String(latest[0].opened_at) : null, latestStatus: latest[0]?.status, funded, pool, config: contractConfig });
+    const [cases, pool, contractConfig] = await Promise.all([chain.listCases({ limit: 500 }), chain.getPool(), chain.getConfig()]);
+    const latest = cases[0];
+    const blocked = runBlockedReason({ nowMs: Date.now(), latestOpenedAtNs: latest ? String(latest.opened_at) : null, latestStatus: latest?.status, funded, pool, config: contractConfig });
+    return { blocked, sequence: nextSequence(cases.map((c) => c.id), scenarioKey) };
   } catch {
     // If the RPC read fails the run would fail too; let the runner report the real error.
-    return null;
+    return { blocked: null };
   }
 }

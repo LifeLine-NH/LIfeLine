@@ -1,6 +1,8 @@
+import { chain } from "@/lib/chain";
 import { config } from "@/lib/config";
 import { getEvidence } from "@/lib/evidence";
 import { SCENARIOS } from "@/lib/scenarios";
+import { runBlockedReason } from "@/lib/swarm/guard";
 import { brokenVerifiers, type ProofSummary, type SwarmTrace, traceToScript } from "@/lib/swarm/trace";
 
 // Runs one demo scenario through B's agent runner: intake, four verifiers, contract decision,
@@ -22,6 +24,11 @@ export async function POST(req: Request) {
   const scenario = SCENARIOS.find((s) => s.key === body.scenarioId);
   if (!scenario) return Response.json({ error: `Pick one of ${SCENARIOS.map((s) => s.key).join(", ")}.` }, { status: 400 });
   if (config.chainMode === "mainnet") return Response.json({ error: "Scenario runs are off on mainnet." }, { status: 403 });
+
+  if (config.chainMode !== "stub") {
+    const blocked = await chainBlockedReason(scenario.expect !== "Rejected");
+    if (blocked) return Response.json({ error: blocked }, { status: 429 });
+  }
 
   if (running || Date.now() < busyUntil) {
     return Response.json({ error: "Another run just started. Try again in a few seconds." }, { status: 429 });
@@ -55,5 +62,15 @@ export async function POST(req: Request) {
   } finally {
     running = false;
     busyUntil = Date.now() + COOLDOWN_MS;
+  }
+}
+
+async function chainBlockedReason(funded: boolean): Promise<string | null> {
+  try {
+    const [latest, pool, contractConfig] = await Promise.all([chain.listCases({ limit: 1 }), chain.getPool(), chain.getConfig()]);
+    return runBlockedReason({ nowMs: Date.now(), latestOpenedAtNs: latest[0] ? String(latest[0].opened_at) : null, funded, pool, config: contractConfig });
+  } catch {
+    // If the RPC read fails the run would fail too; let the runner report the real error.
+    return null;
   }
 }

@@ -127,3 +127,16 @@ export function buildProof(contractId: string, caseId: string, proofHash: string
 export function buildCoordinatorDecision(contractId: string, caseId: string, decision: "confirm" | "reject"): PlannedTransaction {
   return call(contractId, decision === "confirm" ? "human_confirm" : "human_reject", { case_id: caseId }, 100);
 }
+
+// expire(case_id) is open to any account once the bidding window or proof deadline has passed.
+// From Awarded it returns the held second payment to the pool's available balance.
+export function buildExpire(contractId: string, caseId: string): PlannedTransaction {
+  return call(contractId, "expire", { case_id: caseId }, 50);
+}
+
+export function expiryDue(c: { status: string; bidding_ends_at: number | string; proof_deadline: number | string }, nowMs: number): "proof" | "bidding" | null {
+  const passed = (ns: number | string) => Number(ns) > 0 && nowMs > Number(ns) / 1e6;
+  if (c.status === "Awarded" && passed(c.proof_deadline)) return "proof";
+  if ((c.status === "Bidding" || c.status === "Verified") && passed(c.bidding_ends_at)) return "bidding";
+  return null;
+}

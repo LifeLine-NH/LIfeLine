@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { CaseActions, type HashTarget } from "@/components/case/CaseActions";
+import { ExpireButton } from "@/components/case/ExpireButton";
 import { ExplanationCard } from "@/components/case/Explanation";
 import { QuorumSeal } from "@/components/case/QuorumSeal";
 import { BidsSection, EvidenceSection, PayoutPreview, ProofSection } from "@/components/case/Sections";
@@ -183,6 +184,7 @@ async function CaseFile({ params }: { params: Promise<{ id: string }> }) {
 
       <section className="wrap" style={{ paddingBottom: 56 }}>
         <Trail steps={path.steps} note={path.note} />
+        <ExpireButton c={c} />
       </section>
 
       <BidsSection c={c} bids={bids} />

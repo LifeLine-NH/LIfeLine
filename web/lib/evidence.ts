@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getStubEvidence } from "./chain/stub";
+import { blobEnabled, getBlobRecord } from "./evidenceBlob";
 import { config } from "./config";
 
 // Where B's agent runner writes evidence when it runs inside this app (agents/src/intake/bundle.ts).
@@ -15,6 +16,7 @@ async function fromRunner(hash: string): Promise<unknown | null> {
       return JSON.parse(await readFile(path.join(dir, `${hash}.json`), "utf8"));
     } catch {}
   }
+  if (blobEnabled()) return getBlobRecord(hash).catch(() => null);
   return null;
 }
 

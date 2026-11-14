@@ -1,6 +1,7 @@
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { RUNNER_EVIDENCE_DIR } from "@/lib/evidence";
+import { blobEnabled, putBlobRecord } from "@/lib/evidenceBlob";
 import { canonicalJson, hashCanonical } from "@/lib/hash";
 
 // Stores a JSON record (NGO profile, bid plan, proof of delivery) under its SHA-256 so it can be
@@ -23,6 +24,14 @@ export async function POST(req: Request) {
   if (typeof kind !== "string" || !KINDS.has(kind)) return Response.json({ error: `"kind" must be one of ${[...KINDS].join(", ")}.` }, { status: 400 });
 
   const hash = await hashCanonical(body);
+  if (blobEnabled()) {
+    try {
+      await putBlobRecord(hash, canonicalJson(body));
+      return Response.json({ hash, uri: `/api/evidence/${hash}` });
+    } catch (err) {
+      return Response.json({ error: `Couldn't store the record: ${err instanceof Error ? err.message : String(err)}` }, { status: 500 });
+    }
+  }
   try {
     await mkdir(RUNNER_EVIDENCE_DIR, { recursive: true });
     if ((await readdir(RUNNER_EVIDENCE_DIR)).length >= MAX_FILES) return Response.json({ error: "Evidence storage is full." }, { status: 507 });

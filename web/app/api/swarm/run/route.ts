@@ -1,6 +1,7 @@
 import { chain } from "@/lib/chain";
 import { config } from "@/lib/config";
-import { getEvidence } from "@/lib/evidence";
+import { getEvidence, RUNNER_EVIDENCE_DIR } from "@/lib/evidence";
+import { blobEnabled, uploadNewRecords } from "@/lib/evidenceBlob";
 import { SCENARIOS } from "@/lib/scenarios";
 import { nextSequence, runBlockedReason } from "@/lib/swarm/guard";
 import { brokenVerifiers, type ProofSummary, type SwarmTrace, traceToScript } from "@/lib/swarm/trace";
@@ -36,6 +37,7 @@ export async function POST(req: Request) {
     return Response.json({ error: "Another run just started. Try again in a few seconds." }, { status: 429 });
   }
   running = true;
+  const startedAt = Date.now() - 1000;
   try {
     const { executeSwarmScenario } = await import("@lifeline/agents");
     const trace = (await executeSwarmScenario({
@@ -45,6 +47,12 @@ export async function POST(req: Request) {
       includeFullLifecycle: true,
       sequence,
     })) as unknown as SwarmTrace;
+
+    if (blobEnabled()) {
+      // The votes are already on chain, so a failed copy shouldn't hide the run; the case page
+      // just won't be able to show those records.
+      await uploadNewRecords(RUNNER_EVIDENCE_DIR, startedAt).catch((err) => console.error("evidence upload failed", err));
+    }
 
     const broken = brokenVerifiers(trace);
     if (broken.length > 0) {

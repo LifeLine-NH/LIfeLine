@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ContractConfig, Pool } from "../types";
-import { runBlockedReason } from "./guard";
+import { nextSequence, runBlockedReason } from "./guard";
 
 // Values read from lifeline-demo.testnet on 14 Nov 2026.
 const config: ContractConfig = {
@@ -42,5 +42,22 @@ describe("runBlockedReason", () => {
 
   it("refuses funded runs when the pool is mostly reserved", () => {
     expect(runBlockedReason({ nowMs: now, latestOpenedAtNs: null, funded: true, pool: { ...pool, available: "4999999999" }, config })).toMatch(/unreserved/);
+  });
+});
+
+describe("nextSequence", () => {
+  // Case ids on lifeline-demo.testnet on 14 Nov 2026.
+  const ids = ["s6177-2024-09-10-002-s1", "s6177-2024-09-10-001-s5", "s6177-2024-09-10-001-s1", "s1t7d-2025-02-01-001-s3", "s4nh7-2025-01-15-001-s2"];
+
+  it("moves past the highest sequence for that scenario only", () => {
+    expect(nextSequence(ids, "S1")).toBe(3);
+    expect(nextSequence(ids, "S2")).toBe(2);
+    expect(nextSequence(ids, "S5")).toBe(2);
+  });
+
+  it("starts at 1 for a scenario with no cases and isn't fooled by similar tags", () => {
+    expect(nextSequence(["x-2025-01-01-007-s10"], "S1")).toBe(1);
+    expect(nextSequence([], "S3")).toBe(1);
+    expect(nextSequence(["s4nh7-2025-01-15-999-s2"], "S2")).toBe(1000);
   });
 });

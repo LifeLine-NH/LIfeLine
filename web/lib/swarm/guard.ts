@@ -35,3 +35,16 @@ export function runBlockedReason({ nowMs, latestOpenedAtNs, latestStatus, funded
   }
   return null;
 }
+
+// The runner builds case ids as <geohash>-<date>-<sequence>-<scenario>, so the same scenario can't
+// open a second case unless the sequence moves on. Pick one past the highest already on chain.
+export function nextSequence(caseIds: string[], scenarioKey: string): number {
+  const tag = scenarioKey.toLowerCase();
+  const pattern = new RegExp(`-(\\d+)-${tag}$`);
+  let max = 0;
+  for (const id of caseIds) {
+    const m = pattern.exec(id);
+    if (m) max = Math.max(max, Number(m[1]));
+  }
+  return max + 1;
+}

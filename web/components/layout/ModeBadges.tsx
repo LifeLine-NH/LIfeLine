@@ -44,7 +44,11 @@ export function ModeBadges({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState<"data" | "agents" | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const dm = DATA[config.chainMode];
-  const am = AGENTS[config.dataMode];
+  // The replay note about vote transactions is only true when votes were signed on a real chain.
+  const am =
+    config.dataMode === "replay" && config.chainMode === "stub"
+      ? { ...AGENTS.replay, more: "On sample data the votes have no transactions behind them." }
+      : AGENTS[config.dataMode];
 
   useEffect(() => {
     if (!open) return;

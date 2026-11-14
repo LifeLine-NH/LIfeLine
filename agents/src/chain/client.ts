@@ -167,11 +167,14 @@ export class LifelineChainClient {
     const signerId = this.getAccountId(role);
     const near = await this.getNear();
     const account = await near.account(signerId);
+    // close_bidding and vote_delivery schedule ft_transfer + payout callback (30 TGas static)
+    // on top of contract execution, so 30 TGas total runs out of prepaid gas on testnet.
+    const tgas = methodName === "close_bidding" || methodName === "vote_delivery" ? "100000000000000" : "30000000000000";
     const outcome = await account.functionCall({
       contractId: this.contractId,
       methodName,
       args,
-      gas: BigInt("30000000000000") // 30 TGas
+      gas: BigInt(tgas)
     });
     return {
       tx_hash: outcome.transaction.hash,

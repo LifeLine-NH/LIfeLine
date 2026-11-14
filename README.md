@@ -14,10 +14,10 @@ Built at NEAR HACKATHON 2026 for the **AI Swarms** and **Open Innovation** track
 
 | Part | State |
 |---|---|
-| Verifier swarm, intake, simulated NGO bidders (`agents/`) | Working. Runs all four demo scenarios offline with no keys. 34 tests. |
-| Web app (`web/`) | Working on sample data and on B's runner. Donate and full relief lifecycle tested end to end on a local NEAR sandbox. 74 unit tests, 14 sandbox tests. |
+| Verifier swarm, intake, simulated NGO bidders (`agents/`) | Working. Runs all four demo scenarios offline with no keys. 35 tests. |
+| Web app (`web/`) | Working on sample data and on the testnet contract (the hosted site). Donate and full relief lifecycle tested end to end on a local NEAR sandbox. 81 unit tests, 14 sandbox tests. |
 | NEAR Intents payout quotes | Working. Live dry quotes from the 1Click API on mainnet. Sending the payout is not built. |
-| NGO register, bid and proof forms, coordinator confirm and reject | Built. Switched off until the site is pointed at `lifeline-demo.testnet` (`NEXT_PUBLIC_CONTRACT_ID`). |
+| NGO register, bid and proof forms, coordinator confirm and reject, closing an expired case | Working on the hosted site against `lifeline-demo.testnet`. Switched off on sample data. |
 | Relief contract & mock FT (`contracts/`) | Deployed live on NEAR Testnet (`lifeline-demo.testnet` & `usdc.lifeline-demo.testnet`, `$100,000` pool seeded). 16 Rust unit tests + 6 contract sandbox E2E tests. |
 | Hosted demo | Live at https://lifeline-relief.vercel.app. The header badge on every page says whether it is showing sample data or the testnet contract. |
 
@@ -82,12 +82,14 @@ Then open http://localhost:3000. The first start compiles the agents package and
 - **Cases** (`/cases`): every case, rejected ones included. Open any case for the votes, the reasons, the timeline, bids, proof and evidence.
 - **Check hash** on a case page downloads the evidence record and computes its SHA-256 in your browser, then compares it with the stored hash.
 - **Payout quote** on an awarded case asks NEAR Intents, live, what the responder would receive as USDC on Base, Arbitrum, Ethereum or Solana. It is a dry run, so nothing moves.
-- **Donate** (`/donate`) is switched off on sample data. Its full flow is covered by the sandbox tests below.
+- **Donate** (`/donate`) is switched off on sample data. Its full flow is covered by the sandbox tests below. On the hosted site it sends real testnet transactions.
+
+On the hosted site, **Run** sends real NEAR testnet transactions signed by the team's verifier, intake and NGO accounts. To protect the shared keys and the contract's 25,000 USDC daily limit, a new run waits until the previous one has finished and funded runs (S1, S5) pause once that limit is nearly used for the day (it resets at 00:00 UTC). **Replay the recorded case** always works.
 
 ### 3. Run the tests
 
 ```bash
-pnpm test            # agents (34) and web unit tests (74)
+pnpm test            # agents (35) and web unit tests (81)
 pnpm test:contracts  # Rust contract unit tests (13 lifeline + 3 mock-ft = 16)
 pnpm test:e2e        # donate (8) and lifeline contract lifecycle (6) on a local NEAR sandbox (14)
 ```

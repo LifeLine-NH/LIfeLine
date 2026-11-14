@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
     "/api/evidence/[hash]": ["storage/evidence/**"],
     "/cases/[id]": ["storage/evidence/**"],
     "/": ["storage/evidence/**"],
+    "/ngo": ["storage/evidence/**"],
   },
   turbopack: {
     rules: {

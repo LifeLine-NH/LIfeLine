@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { TGAS } from "../near/units";
-import { buildBid, buildCoordinatorDecision, buildProfile, buildProof, buildProofRecord, buildRegister, checkBid, FormError, proofWarning } from "./actions";
+import { buildBid, buildCoordinatorDecision, buildExpire, expiryDue, buildProfile, buildProof, buildProofRecord, buildRegister, checkBid, FormError, proofWarning } from "./actions";
 
 const C = "lifeline.testnet";
 const args = (tx: ReturnType<typeof buildBid>) => tx.actions[0].params;
@@ -74,5 +74,23 @@ describe("buildCoordinatorDecision", () => {
   it("calls human_confirm or human_reject with the case id", () => {
     expect(args(buildCoordinatorDecision(C, "c9", "confirm")).methodName).toBe("human_confirm");
     expect(args(buildCoordinatorDecision(C, "c9", "reject")).args).toEqual({ case_id: "c9" });
+  });
+});
+
+describe("expire", () => {
+  it("calls expire with the case id and no deposit", () => {
+    const tx = buildExpire("lifeline-demo.testnet", "s6177-2024-09-10-001-s5");
+    expect(tx.receiverId).toBe("lifeline-demo.testnet");
+    expect(tx.actions[0].params).toMatchObject({ methodName: "expire", args: { case_id: "s6177-2024-09-10-001-s5" }, deposit: "0" });
+  });
+
+  it("is due only after the deadline that matters for the status", () => {
+    const deadlineMs = Date.UTC(2026, 10, 14, 6, 37);
+    const ns = String(deadlineMs * 1e6);
+    expect(expiryDue({ status: "Awarded", bidding_ends_at: 0, proof_deadline: ns }, deadlineMs + 1000)).toBe("proof");
+    expect(expiryDue({ status: "Awarded", bidding_ends_at: 0, proof_deadline: ns }, deadlineMs - 1000)).toBeNull();
+    expect(expiryDue({ status: "Bidding", bidding_ends_at: ns, proof_deadline: 0 }, deadlineMs + 1000)).toBe("bidding");
+    expect(expiryDue({ status: "ProofSubmitted", bidding_ends_at: ns, proof_deadline: ns }, deadlineMs + 1000)).toBeNull();
+    expect(expiryDue({ status: "Delivered", bidding_ends_at: ns, proof_deadline: ns }, deadlineMs + 1000)).toBeNull();
   });
 });

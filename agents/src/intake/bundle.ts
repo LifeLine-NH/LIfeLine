@@ -98,13 +98,18 @@ export function ingestReportsToBundles(
   );
 }
 
+// AGENT_EVIDENCE_DIR lets hosts with a read-only app folder (Vercel) write under /tmp instead.
+function defaultEvidenceDir(): string {
+  return process.env.AGENT_EVIDENCE_DIR || path.resolve(process.cwd(), "storage/evidence");
+}
+
 /**
  * Persists an EvidenceBundle or VoteRecord by its SHA-256 hash so C's `/api/evidence/<hash>` route can serve it.
  */
 export function persistEvidenceArtifact(
   hash: string,
   payload: unknown,
-  storageDir = path.resolve(process.cwd(), "storage/evidence")
+  storageDir = defaultEvidenceDir()
 ): string {
   mkdirSync(storageDir, { recursive: true });
   const filePath = path.join(storageDir, `${hash}.json`);
@@ -117,7 +122,7 @@ export function persistEvidenceArtifact(
  */
 export function readEvidenceArtifact<T = unknown>(
   hash: string,
-  storageDir = path.resolve(process.cwd(), "storage/evidence")
+  storageDir = defaultEvidenceDir()
 ): T | null {
   const filePath = path.join(storageDir, `${hash}.json`);
   if (!existsSync(filePath)) return null;

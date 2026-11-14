@@ -12,10 +12,35 @@ const RECORDINGS_ROOT = path.resolve(__dirname, "../../recordings");
 export type LlmAgentRole = "fact" | "sev" | "red" | "delivery";
 
 export interface LlmModelConfig {
-  provider: "near-ai-cloud" | "secondary";
+  /** Which configured key slot the role uses: primary (NEAR_AI_*) or secondary (SECONDARY_LLM_*). */
+  slot: "primary" | "secondary";
+  /** Human label for the provider, derived from the base URL host (never hard-coded). */
+  provider: string;
   baseUrl: string;
   apiKey: string;
   modelId: string;
+}
+
+const KNOWN_PROVIDER_HOSTS: Array<[string, string]> = [
+  ["api.groq.com", "groq"],
+  ["generativelanguage.googleapis.com", "google-ai-studio"],
+  ["cloud-api.near.ai", "near-ai-cloud"],
+  ["openrouter.ai", "openrouter"],
+  ["api.openai.com", "openai"]
+];
+
+/** Derives a provider label from an OpenAI-compatible base URL, falling back to the bare host. */
+export function providerFromBaseUrl(baseUrl: string): string {
+  let host: string;
+  try {
+    host = new URL(baseUrl).hostname.toLowerCase();
+  } catch {
+    return "unknown";
+  }
+  for (const [suffix, label] of KNOWN_PROVIDER_HOSTS) {
+    if (host === suffix || host.endsWith(`.${suffix}`)) return label;
+  }
+  return host;
 }
 
 export function getModelConfigForRole(role: LlmAgentRole): LlmModelConfig {
@@ -35,30 +60,36 @@ export function getModelConfigForRole(role: LlmAgentRole): LlmModelConfig {
   switch (role) {
     case "fact":
       return {
-        provider: "near-ai-cloud",
+        slot: "primary",
+        provider: providerFromBaseUrl(primaryBaseUrl),
         baseUrl: primaryBaseUrl,
         apiKey: primaryApiKey,
         modelId: process.env.FACT_MODEL_ID ?? "openai/gpt-oss-120b"
       };
     case "sev":
       return {
-        provider: "near-ai-cloud",
+        slot: "primary",
+        provider: providerFromBaseUrl(primaryBaseUrl),
         baseUrl: primaryBaseUrl,
         apiKey: primaryApiKey,
         modelId: process.env.SEV_MODEL_ID ?? "qwen/qwen3.8-27b"
       };
     case "red":
     case "delivery":
+      // Without a secondary key the red team falls back to the primary provider.
+      // That means it shares a provider with Fact and Severity; say so wherever models are listed.
       if (!secondaryApiKey && primaryApiKey) {
         return {
-          provider: "secondary",
+          slot: "secondary",
+          provider: providerFromBaseUrl(primaryBaseUrl),
           baseUrl: primaryBaseUrl,
           apiKey: primaryApiKey,
           modelId: process.env.RED_MODEL_ID ?? "openai/gpt-oss-20b"
         };
       }
       return {
-        provider: "secondary",
+        slot: "secondary",
+        provider: providerFromBaseUrl(secondaryBaseUrl),
         baseUrl: secondaryBaseUrl,
         apiKey: secondaryApiKey,
         modelId: process.env.RED_MODEL_ID ?? "gemini-2.5-flash"
@@ -172,7 +203,7 @@ export async function callStructuredLlm<T>(
         rawText = await options.customFetch(options.systemPrompt, options.userPrompt, attempt);
       } else {
         if (!config.apiKey) {
-          throw new Error(`Missing API key for provider ${config.provider}`);
+          throw new Error(`Missing API key for ${config.slot} provider ${config.provider}`);
         }
         const endpoint = `${config.baseUrl.replace(/\/$/, "")}/chat/completions`;
         const response = await fetch(endpoint, {

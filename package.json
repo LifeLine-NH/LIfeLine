@@ -13,8 +13,10 @@
     "test:web": "pnpm --filter @lifeline/web test",
     "test:e2e": "pnpm --filter @lifeline/web test:e2e",
     "swarm:run": "pnpm --filter @lifeline/agents swarm:run",
-    "demo:replay": "pnpm --filter @lifeline/agents demo:replay"
+    "demo:replay": "pnpm --filter @lifeline/agents demo:replay",
+    "preflight": "pnpm --filter @lifeline/agents exec tsx ../scripts/preflight.ts"
   },
+  "packageManager": "pnpm@10.26.2",
   "engines": {
     "node": ">=20.0.0"
   }

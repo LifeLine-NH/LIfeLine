@@ -71,3 +71,7 @@ Recorded on `lifeline-demo.testnet` (14 Nov 2026). Every link opens the transact
 | S5 | `s6177-2024-09-10-001-s5` | Delivery vote (red: reject) | [`7dAeiCh8SA…`](https://testnet.nearblocks.io/txns/7dAeiCh8SA2SKzjmUyaEMaXxjFd5orKVCJsugNc3WYeK) |
 
 Relief contract account: [`lifeline-demo.testnet`](https://testnet.nearblocks.io/address/lifeline-demo.testnet)
+
+## Live mode check (14 Nov 2026)
+
+Running `S1` against live external feeds and Groq (`pnpm swarm:run --scenario S1 --mode live --chain stub`) produced `Rejected` (`geo: Yes, fact: No, sev: Yes, red: No`). Live Open-Meteo archive data for Maiduguri on 9–10 Sep 2024 shows no local rainfall anomaly because the real flood was caused by the Alau Dam breach rather than local rain, so `fact` and `red` rejected the uncorroborated rainfall claim.

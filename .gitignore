@@ -27,3 +27,6 @@ lifeline-design-handoff.zip
 
 # Evidence written by the agent runner when it runs inside the web app
 web/storage/
+.vercel
+.env*
+!.env.example

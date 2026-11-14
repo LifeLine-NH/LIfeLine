@@ -21,9 +21,16 @@ describe("runBlockedReason", () => {
     expect(runBlockedReason({ nowMs: now, latestOpenedAtNs: null, funded: true, pool, config })).toBeNull();
   });
 
-  it("spaces runs out across server instances", () => {
-    expect(runBlockedReason({ nowMs: now, latestOpenedAtNs: nsAgo(20), funded: false, pool, config })).toMatch(/20 seconds ago.*wait 40 seconds/);
-    expect(runBlockedReason({ nowMs: now, latestOpenedAtNs: nsAgo(60), funded: false, pool, config })).toBeNull();
+  it("waits while the previous run may still be sending transactions", () => {
+    expect(runBlockedReason({ nowMs: now, latestOpenedAtNs: nsAgo(15), latestStatus: "Awarded", funded: false, pool, config })).toMatch(/15 seconds ago.*wait 25 seconds/);
+    expect(runBlockedReason({ nowMs: now, latestOpenedAtNs: nsAgo(15), latestStatus: "Open", funded: false, pool, config })).not.toBeNull();
+    expect(runBlockedReason({ nowMs: now, latestOpenedAtNs: nsAgo(40), latestStatus: "Awarded", funded: false, pool, config })).toBeNull();
+  });
+
+  it("lets the next run start as soon as the previous case is final", () => {
+    for (const latestStatus of ["Rejected", "NeedsReview", "Delivered", "Expired"]) {
+      expect(runBlockedReason({ nowMs: now, latestOpenedAtNs: nsAgo(12), latestStatus, funded: true, pool, config })).toBeNull();
+    }
   });
 
   it("refuses funded runs once the daily limit can't cover a tier 3 cap", () => {

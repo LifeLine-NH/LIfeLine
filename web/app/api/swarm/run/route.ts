@@ -68,7 +68,7 @@ export async function POST(req: Request) {
 async function chainBlockedReason(funded: boolean): Promise<string | null> {
   try {
     const [latest, pool, contractConfig] = await Promise.all([chain.listCases({ limit: 1 }), chain.getPool(), chain.getConfig()]);
-    return runBlockedReason({ nowMs: Date.now(), latestOpenedAtNs: latest[0] ? String(latest[0].opened_at) : null, funded, pool, config: contractConfig });
+    return runBlockedReason({ nowMs: Date.now(), latestOpenedAtNs: latest[0] ? String(latest[0].opened_at) : null, latestStatus: latest[0]?.status, funded, pool, config: contractConfig });
   } catch {
     // If the RPC read fails the run would fail too; let the runner report the real error.
     return null;

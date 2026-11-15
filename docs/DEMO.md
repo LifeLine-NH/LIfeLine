@@ -2,6 +2,48 @@
 
 About two and a half minutes. Record the large screen view at 1600 × 900 and the case pages at normal desktop width. Everything below can be shown today on sample data; the transaction table at the end is filled in once the run happens on testnet.
 
+## Scenario Comparison Matrix
+
+```mermaid
+flowchart LR
+  subgraph S1["S1: Genuine Report (Maiduguri Flood)"]
+    s1_in["5 reports · 5 senders<br/>Corroborated by Open-Meteo, GDACS, ReliefWeb"] --> s1_v["4 Yes votes<br/>Tier 3 Cap: 5,000 USDC"]
+    s1_v --> s1_b["Lowest bid: 3,400 USDC<br/>Tranche 1 (40%): 1,360 USDC paid"]
+    s1_b --> s1_p["Valid proof (620 households, 0.4 km)<br/>4 of 4 delivery ok -> Tranche 2 (60%): 2,040 USDC paid"]
+  end
+
+  subgraph S2["S2: Keyword Attack + Prompt Injection"]
+    s2_in["12 reports · 12 senders<br/>Repeats 'flood' in dry area + hidden SYSTEM INSTRUCTION"] --> s2_v["Geo: Yes | Fact: No | Sev: No | Red: No<br/>(3 No votes >= 2 threshold)"]
+    s2_v --> s2_out["Rejected on-chain<br/>0 USDC reserved or paid"]
+  end
+
+  subgraph S3["S3: Sybil Flood of Fakes"]
+    s3_in["30 reports · 1 sender<br/>Bot template burst within minutes"] --> s3_v["Geo: No (source_diversity = 1)<br/>Fact: No | Sev: No | Red: No"]
+    s3_v --> s3_out["Rejected on-chain<br/>0 USDC reserved or paid"]
+  end
+
+  subgraph S5["S5: Inflated Delivery Proof"]
+    s5_in["Verified & Awarded (3,400 USDC)<br/>Tranche 1 (1,360 USDC) released"] --> s5_p["Proof claims 50,000 households (83.3x plan)<br/>& GPS 86 km away from disaster zone"]
+    s5_p --> s5_out["0 of 4 delivery ok (4 reject)<br/>Tranche 2 (2,040 USDC) withheld in pool"]
+  end
+```
+
+## Visual Tour of the Live Testnet Cases
+
+### 1. All Cases Overview (`/cases`)
+![All cases on NEAR Testnet showing Delivered, Awarded, and Rejected cases](images/cases.png)
+
+### 2. S1 — Verified, Funded & Delivered (`s6177-2024-09-10-002-s1`)
+![S1 Delivered case showing 4 of 4 Yes votes and the 5,000 USDC Cap Governor calculation](images/case-delivered.png)
+
+![S1 Verifier Vote Cards with SHA-256 hash verification and 8-step on-chain timeline](images/case-votes.png)
+
+### 3. S2 — Rejected Keyword & Prompt-Injection Attack (`s4nh7-2025-01-15-001-s2`)
+![S2 Rejected case showing Red Team prompt-injection catch and contradicting external sources](images/case-rejected.png)
+
+### 4. S5 — Fraudulent Delivery Proof Withheld (`s6177-2024-09-10-001-s5`)
+![S5 Delivery verification rejecting the 50,000-household claim and withholding the 60% second tranche](images/case-withheld.png)
+
 ## Before recording
 
 1. `pnpm install`, then `pnpm dev` (or the hosted site once it is up).

@@ -53,6 +53,34 @@ NGO registration (permissionless with sybil bond):
 
 Verifier & intake keys created by `scripts/create-accounts.ts` are **restricted `FunctionCall` access keys** (`0` NEAR allowance for value transfers, scoped strictly to `submit_case` for `intake`, and `vote` / `vote_delivery` for `v-geo`, `v-fact`, `v-sev`, `v-red`). See [ACCOUNTS.md](ACCOUNTS.md).
 
+```mermaid
+flowchart LR
+  subgraph Callers["Registered Accounts & Callers"]
+    OW["Owner<br/>lifeline-demo.testnet"]
+    IN["Intake<br/>intake.lifeline-demo.testnet<br/>(FunctionCall key)"]
+    VF["4 Verifiers<br/>v-geo · v-fact · v-sev · v-red<br/>(FunctionCall keys)"]
+    CO["Coordinator<br/>coord.lifeline-demo.testnet"]
+    NG["Registered NGOs<br/>ngo-*.lifeline-demo.testnet<br/>(Bonded responders)"]
+    DN["Donors & Public<br/>(Any NEAR account)"]
+  end
+
+  subgraph Contract["lifeline-demo.testnet Methods"]
+    M_ADM["set_config<br/>register_intake / verifier / coordinator"]
+    M_SUB["submit_case"]
+    M_VOT["vote · vote_delivery"]
+    M_HUM["human_confirm · human_reject"]
+    M_NGO["register_ngo · place_bid · submit_proof"]
+    M_PUB["close_bidding · expire · ft_on_transfer"]
+  end
+
+  OW --> M_ADM
+  IN --> M_SUB
+  VF --> M_VOT
+  CO --> M_HUM
+  NG --> M_NGO
+  DN --> M_PUB
+```
+
 ### Cap Governor Formula
 
 When a case is verified (tier `1..=3`), its spending `cap` is computed dynamically at the moment bidding closes and at bid validation as the minimum of three bounds:
@@ -63,17 +91,24 @@ where `available = pool_balance - pool_reserved`. Rolling daily window resets ev
 
 ### Case Lifecycle & State Transitions
 
-```
-Open ──(vote x4 / quorum)──▶ Verified / Bidding ──(close_bidding + bids)──▶ Awarded
- │                              │                                             │
- ├─▶ NeedsReview ──(human_reject)──▶ Rejected                                 ├──(expire after proof_deadline)──▶ Expired
- │        └──(human_confirm)─────────▶ Verified / Bidding                     │
- └─(2 No votes)─────────────────────▶ Rejected                                ▼
-                                                                       ProofSubmitted
-                                                                        │         │
-                                              (>=2 Ok votes) ◀──────────┘         └──(>=3 No votes: 1st retry -> Awarded; 2nd -> Expired)
-                                                    ▼
-                                                Delivered
+```mermaid
+stateDiagram-v2
+  [*] --> Open: submit_case (intake)
+  Open --> Bidding: 3 of 4 Yes votes (quorum)
+  Open --> Rejected: 2 of 4 No votes (early reject)
+  Open --> NeedsReview: 4 votes cast without quorum
+  NeedsReview --> Bidding: human_confirm (coordinator)
+  NeedsReview --> Rejected: human_reject (coordinator)
+  Bidding --> Awarded: close_bidding (lowest ask <= cap wins, Tranche 1 40% sent)
+  Bidding --> Expired: close_bidding with 0 valid bids / bidding_ends_at passed
+  Awarded --> ProofSubmitted: submit_proof (by winning NGO before proof_deadline)
+  Awarded --> Expired: expire after proof_deadline (unspent 60% returned, -20 reputation)
+  ProofSubmitted --> Delivered: >=2 of 4 vote_delivery(ok=true) (Tranche 2 60% sent, +10 reputation)
+  ProofSubmitted --> Awarded: >=3 of 4 vote_delivery(ok=false) on 1st attempt (1 retry allowed)
+  ProofSubmitted --> Expired: >=3 of 4 vote_delivery(ok=false) on 2nd attempt (60% returned to pool)
+  Rejected --> [*]
+  Delivered --> [*]
+  Expired --> [*]
 ```
 
 | Method | Caller | Gas / Deposit | Behavior |
@@ -93,6 +128,24 @@ Open ──(vote x4 / quorum)──▶ Verified / Bidding ──(close_bidding +
 Both `#[private]` callbacks check `env::promise_result(0)`:
 - On `PromiseResult::Successful(_)`: emits `tranche_released` (and `delivered` on Tranche 2).
 - On failure (e.g., winner lacks `storage_deposit` on `pool_token`): restores `pool_balance`, `pool_reserved`, `disbursed_today`, and reverts `Case.status` / paid counters (`Bidding` on Tranche 1 failure, `ProofSubmitted` on Tranche 2 failure), adjusting winner reputation accordingly. While a transfer is in flight (`payout_pending`), concurrent `close_bidding`, `vote_delivery`, or `expire` calls on that case are blocked.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Caller as Caller (Any / Verifier)
+  participant L as lifeline-demo.testnet
+  participant FT as usdc.lifeline-demo.testnet
+
+  Caller->>L: close_bidding(case_id) [or 2nd vote_delivery(ok=true)]
+  Note over L: Optimistically update state:<br/>payout_pending = true<br/>deduct pool_balance, reserve award,<br/>increment disbursed_today
+  L->>FT: ft_transfer(winner, tranche_amount) [15 TGas, 1 yoctoNEAR]
+  FT-->>L: on_tranche1_transfer / on_tranche2_transfer [15 TGas]
+  alt PromiseResult::Successful
+    Note over L: payout_pending = false<br/>Emit EVENT_JSON tranche_released (+ delivered)
+  else PromiseResult::Failed (e.g. winner not registered on FT)
+    Note over L: Rollback state:<br/>payout_pending = false<br/>restore pool_balance, pool_reserved, disbursed_today<br/>revert status to Bidding / ProofSubmitted
+  end
+```
 
 ### View Methods
 

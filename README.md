@@ -1,14 +1,41 @@
 # LifeLine
 
+![LifeLine — Relief money that moves only when four checks agree](web/public/og.png)
+
 A public disaster relief pool on NEAR where money moves only when four independent checks agree.
 
 People and NGOs donate to one shared pool. Field reports about a disaster (SMS relays, partner relays, a web form) are grouped into a case. Four verifier agents check the case, each with its own NEAR account: one checks the spread of reports without AI, one checks outside data such as rainfall and disaster alerts, one proposes how severe it is, and one red team agent argues the report is fake. Three yes votes fund the case and two no votes reject it. A contract, not an AI, caps how much can be spent. NGOs bid to respond, the winner is paid in two parts, and the second part waits until the verifiers agree the delivery really happened. Anyone can check every vote and every evidence record from the website.
 
 Built at NEAR HACKATHON 2026 for the **AI Swarms** and **Open Innovation** tracks.
 
-> **60-second path:**
-> 1. Open the hosted demo: https://lifeline-relief.vercel.app
-> 2. Or run offline locally: `pnpm install && pnpm demo:replay && pnpm dev`
+> **60-second path for judges:**
+> 1. **Hosted live demo (NEAR Testnet):** [https://lifeline-relief.vercel.app](https://lifeline-relief.vercel.app)
+>    - [Delivered case (`S1`)](https://lifeline-relief.vercel.app/cases/s6177-2024-09-10-002-s1) · [Rejected keyword/injection attack (`S2`)](https://lifeline-relief.vercel.app/cases/s4nh7-2025-01-15-001-s2) · [Rejected sybil attack (`S3`)](https://lifeline-relief.vercel.app/cases/s1t7d-2025-02-01-001-s3) · [Withheld inflated proof (`S5`)](https://lifeline-relief.vercel.app/cases/s6177-2024-09-10-001-s5)
+> 2. **Run offline locally (zero API keys):** `pnpm install && pnpm demo:replay && pnpm dev`
+
+## Visual Tour (Live on NEAR Testnet)
+
+| Verified & Delivered (`S1`) | Rejected Attack (`S2`) |
+|---|---|
+| ![Delivered case on NEAR Testnet](docs/images/case-delivered.png) | ![Rejected keyword & injection attack](docs/images/case-rejected.png) |
+| **4 of 4 Yes votes** · Cap set to **5,000 USDC** · Lowest bid (**3,400 USDC**) paid in two tranches (`1,360` + `2,040 USDC`). | **3 of 4 No votes** · Red Team catches hidden `"SYSTEM INSTRUCTION"` prompt injection; external weather tools show dry conditions. |
+
+| Vote Cards & Browser Hash Verification (`S1`) | Fraudulent Delivery Proof Withheld (`S5`) |
+|---|---|
+| ![Vote reasoning cards and timeline](docs/images/case-votes.png) | ![Withheld second payment on inflated proof](docs/images/case-withheld.png) |
+| Every vote links to its NearBlocks transaction and includes client-side SHA-256 verification against the on-chain `evidence_hash`. | NGO claims **50,000 households** (83.3x plan) & GPS **86 km away** · **0 of 4 delivery ok** · **2,040 USDC (60%)** stays in the pool. |
+
+## Documentation Map
+
+| Guide | What it covers |
+|---|---|
+| [**Architecture (`docs/ARCHITECTURE.md`)**](docs/ARCHITECTURE.md) | System overview, full 14-step sequence diagram, intake clustering, 4-verifier decision trees, state machine, money flow, evidence storage, and deployment topology |
+| [**Smart Contracts (`docs/CONTRACT.md`)**](docs/CONTRACT.md) | `contracts/lifeline` & `contracts/mock-ft` specification, access control matrix, Cap Governor math, payout rollback sequence, NEP-297 events |
+| [**Accounts & Restricted Keys (`docs/ACCOUNTS.md`)**](docs/ACCOUNTS.md) | Live NEAR Testnet account inventory, public keys, and method-scoped `FunctionCall` key hierarchy (`0.25 NEAR` allowance, zero transfer capability) |
+| [**Security & Threat Matrix (`docs/SECURITY.md`)**](docs/SECURITY.md) | Defense-in-depth diagram, threat model across intake, agents, web app, and contract, mapped to automated tests and known limits |
+| [**Agent Security & Disclosure (`docs/AGENTS_SECURITY.md`)**](docs/AGENTS_SECURITY.md) | Detailed verifier threat mitigations and line-by-line *"What is Real vs. Simulated"* disclosure |
+| [**Donations Protocol (`docs/DONATIONS.md`)**](docs/DONATIONS.md) | NEP-141 `ft_transfer_call` pre-flight checks, cross-contract callback rules, and RPC receipt outcome verification sequence |
+| [**Demo Walkthrough & Testnet Tx Links (`docs/DEMO.md`)**](docs/DEMO.md) | 2.5-minute demo script, scenario comparison diagram, screenshots, and all **38 NearBlocks Testnet transaction links** |
 
 ## Status (14 Nov 2026)
 
@@ -107,16 +134,63 @@ See [docs/ACCOUNTS.md](docs/ACCOUNTS.md), [docs/CONTRACT.md](docs/CONTRACT.md), 
 ## How it works
 
 ```mermaid
-flowchart LR
-  R["Field reports<br/>(SMS, partner, web)"] --> I["Intake<br/>cluster + hash sender IDs"]
-  I -->|SHA-256 on chain| V["4 Verifiers (4 NEAR accounts)<br/>Geo · Fact · Severity · Red team"]
-  V -->|3 Yes funds / 2 No rejects| C["Relief Contract<br/>cap = min(tier, pool%, daily left)"]
-  C --> B["NGOs bid<br/>lowest ask under cap wins"]
-  B -->|Tranche 1 (40%)| D["Proof of delivery"]
-  D -->|2 of 4 verifiers agree| P["Tranche 2 (60%)<br/>optional NEAR Intents quote"]
+flowchart TB
+  subgraph Offchain["Off-Chain Intake & Independent Verifier Swarm"]
+    R["Field Reports<br/>(SMS · Partner · Web)"] --> I["Intake Clustering<br/>(<=1 km, <=1 hr, SHA-256 sender IDs,<br/>PII scrubbed, canonical bundle_hash)"]
+    EXT["External Data Tools<br/>Open-Meteo · GDACS · ReliefWeb · USGS"]
+    subgraph Swarm["4 Verifier Agents (4 Distinct NEAR Accounts + Restricted FunctionCall Keys)"]
+      VG["v-geo.lifeline-demo.testnet<br/>Deterministic code (no AI):<br/>sender diversity, template & burst check"]
+      VF["v-fact.lifeline-demo.testnet<br/>Tools + gpt-oss-120b:<br/>requires >=2 external tools supporting"]
+      VS["v-sev.lifeline-demo.testnet<br/>qwen3.8-27b:<br/>proposes Severity Tier 1-4"]
+      VR["v-red.lifeline-demo.testnet<br/>Regex guard + gpt-oss-20b:<br/>argues report is fake / detects injection"]
+    end
+    I --> VG & VF & VS & VR
+    EXT --> VF & VR
+  end
+
+  subgraph Onchain["NEAR Testnet (lifeline-demo.testnet & usdc.lifeline-demo.testnet)"]
+    Q{"On-Chain Quorum<br/>3 Yes = Fund<br/>2 No = Reject"}
+    CAP["Cap Governor<br/>cap = min(tier_cap, 20% available pool, remaining daily limit)"]
+    BID["Reverse Auction<br/>Bonded NGOs bid ask <= cap<br/>Lowest valid ask wins"]
+    T1["Tranche 1 Released (40%)<br/>Remaining 60% locked in pool_reserved"]
+    DEL{"Delivery Proof Check<br/>GPS <=5 km & households 25%-300%<br/>>=2 of 4 vote_delivery(ok=true)"}
+    T2["Tranche 2 Released (60%)<br/>Status: Delivered (+10 reputation)"]
+    HOLD["Tranche 2 Withheld / Returned to Pool<br/>(After 2 failed proofs or deadline expiry)"]
+  end
+
+  VG & VF & VS & VR -- "vote(verdict, confidence, tier, evidence_hash)" --> Q
+  Q -- "3 Yes" --> CAP --> BID --> T1 --> DEL
+  Q -- "2 No" --> REJ["Status: Rejected (0 USDC spent)"]
+  DEL -- ">=2 ok" --> T2
+  DEL -- ">=3 reject / expired" --> HOLD
 ```
 
+### The Four Verifiers & On-Chain Rules at a Glance
+
+| Verifier / Component | NEAR Account | Key Type | Decision Rule / Guardrail |
+|---|---|---|---|
+| **Intake Oracle** | `intake.lifeline-demo.testnet` | `FunctionCall` (`submit_case`, `close_bidding`) | Clusters reports within `1 km` and `1 hour`, hashes `source_id` with SHA-256, scrubs phone/email PII, and commits `bundle_hash`. |
+| **Geo Verifier** | `v-geo.lifeline-demo.testnet` | `FunctionCall` (`vote`, `vote_delivery`) | **100% deterministic code (no LLM).** Votes `No` if `source_diversity <= 1`, any single sender $\ge 80\%$, or $\ge 75\%$ share a message template. Votes `Yes` if $\ge 3$ senders, max share $\le 40\%$, spread $60\text{–}3600\text{ s}$, radius $\le 1\text{ km}$. |
+| **Fact Verifier** | `v-fact.lifeline-demo.testnet` | `FunctionCall` (`vote`, `vote_delivery`) | Queries Open-Meteo, GDACS, ReliefWeb, and USGS + LLM (`openai/gpt-oss-120b`). **Code guard:** overrides LLM `Yes` unless $\ge 2$ external tools return `supports === "yes"`. |
+| **Severity Verifier** | `v-sev.lifeline-demo.testnet` | `FunctionCall` (`vote`, `vote_delivery`) | Classifies humanitarian impact into Tier 1–4 (`qwen/qwen3.8-27b`). Tier 1 = no funding; Tiers 1–3 on-chain caps: `2,000`, `5,000`, `10,000 USDC`. |
+| **Red-Team Verifier** | `v-red.lifeline-demo.testnet` | `FunctionCall` (`vote`, `vote_delivery`) | Runs regex prompt-injection detection (`detectPromptInjection`) + adversarial LLM (`openai/gpt-oss-20b`). Unrebutted objections or injection attempts force `No`. |
+| **Cap Governor** | `lifeline-demo.testnet` | Contract rule | $\text{cap} = \min(\text{tier\_cap}[\text{tier}],\; 20\% \times \text{available\_pool},\; \text{daily\_limit} - \text{disbursed\_today})$. |
+| **Two-Tranche Escrow** | `lifeline-demo.testnet` | Contract rule | Pays **40%** (`tranche1_bps = 4000`) on `close_bidding` and holds **60%** until $\ge 2$ of 4 verifiers approve `submit_proof` (`vote_delivery(ok=true)`). |
+
 More detail, including the case states and what is stored where: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Command Reference
+
+| Command | Description |
+|---|---|
+| `pnpm demo:replay` | Run all 4 scenarios (`S1`, `S2`, `S3`, `S5`) offline against recorded fixtures and verify expected statuses |
+| `pnpm swarm:run --scenario S1` | Run a single scenario (`S1`, `S2`, `S3`, `S5`) with full per-verifier output (`--mode replay\|live`, `--chain stub\|testnet`) |
+| `pnpm dev` | Start the Next.js web application at `http://localhost:3000` |
+| `pnpm test` | Run all TypeScript unit tests (`35` agent tests + `81` web tests = `116` tests) |
+| `pnpm test:contracts` | Run Rust smart contract unit tests (`13` lifeline + `3` mock-ft = `16` tests) |
+| `pnpm test:e2e` | Run NEAR Sandbox end-to-end tests (`8` donate + `6` full lifeline lifecycle = `14` tests) |
+| `pnpm build:contracts` | Compile `lifeline.wasm` and `mock_ft.wasm` MVP WebAssembly binaries |
+| `pnpm preflight` | Verify environment configuration, contract state, registered accounts, and evidence hashes |
 
 ## Track fit: AI Swarms
 

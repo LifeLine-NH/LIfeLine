@@ -4,6 +4,45 @@ What could go wrong, what stops it, and the test that shows it. Agent rows come 
 
 Run every test named here with `pnpm test` (agents and website), `pnpm test:contracts` (Rust contract unit tests), and `pnpm test:e2e` (NEAR sandbox end-to-end tests).
 
+## Defense-in-Depth Architecture
+
+```mermaid
+flowchart TD
+  subgraph Attacks["Adversarial Inputs & Threat Vectors"]
+    A1["S3: Sybil Flood of Fakes<br/>(30 reports from 1 sender / bot template)"]
+    A2["S2: Keyword Stuffing + Prompt Injection<br/>(12 'flood' reports in dry area + SYSTEM INSTRUCTION)"]
+    A3["S5: Inflated Delivery Proof<br/>(50,000 households vs 600 plan, GPS 86 km off)"]
+    A4["Key Compromise / Pool Drain Attempt<br/>(Leaked verifier key or oversized bid)"]
+  end
+
+  subgraph L1["Layer 1: Intake & Deterministic Geo (No AI)"]
+    G1["SHA-256 sender hashing & PII scrubbing<br/>GeoVerifier rejects single-sender dominance (>=80%)<br/>or template repetition (>=75%)"]
+  end
+
+  subgraph L2["Layer 2: External Evidence & Adversarial Red Team"]
+    G2["FactVerifier code guard requires >=2 external tools<br/>(Open-Meteo, GDACS, ReliefWeb, USGS) supporting claim<br/>RedTeamVerifier regex + adversarial LLM blocks injection"]
+  end
+
+  subgraph L3["Layer 3: On-Chain Quorum, Restricted Keys & Cap Governor"]
+    G3["Method-scoped FunctionCall keys (0 NEAR transfer)<br/>3-of-4 Yes to fund, 2-of-4 No to reject<br/>Cap = min(tier_cap, 20% available pool, remaining daily_limit)"]
+  end
+
+  subgraph L4["Layer 4: Two-Tranche Escrow & Delivery Verification"]
+    G4["40% paid on award; 60% held in pool_reserved<br/>Delivery verifier checks GPS <=5 km & households 25%-300%<br/>Needs >=2 of 4 ok votes or expires back to pool"]
+  end
+
+  A1 --> L1
+  L1 -- "S3 blocked (Geo votes No)" --> R1["Rejected (0 USDC spent)"]
+  A2 --> L2
+  L2 -- "S2 blocked (Fact, Sev, Red vote No)" --> R1
+  A4 --> L3
+  L3 -- "Cannot transfer funds or exceed cap" --> R2["Contained on NEAR"]
+  A3 --> L4
+  L4 -- "S5 blocked (0 of 4 delivery ok)" --> R3["Tranche 2 (60%) withheld in pool"]
+```
+
+![Live rejected case (S2) showing Red Team prompt-injection detection and contradicting external weather sources](images/case-rejected.png)
+
 ## Fake or manipulated reports
 
 | Threat | What stops it | Test |
@@ -20,6 +59,8 @@ Run every test named here with `pnpm test` (agents and website), `pnpm test:cont
 | Threat | What stops it | Test |
 |---|---|---|
 | The winning NGO inflates its proof, for example 50,000 households against a plan of 600 (S5) | The delivery check compares the location with the case area and the household count with the plan. The second payment needs 2 of 4 verifiers to agree the proof checks out. | `agents/tests/delivery.test.ts`, `agents/tests/e2e-scenarios.test.ts` (S5 stays Awarded) |
+
+![Live S5 case showing all four delivery verifiers rejecting the 50,000-household / 86km-off proof and withholding Tranche 2](images/case-withheld.png)
 
 ## Evidence and privacy
 

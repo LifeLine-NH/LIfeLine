@@ -2,6 +2,38 @@
 
 This is the agreement between the relief contract (developer A) and the web app (developer C). If the contract follows it, the donate page works without changes.
 
+![Live donate page showing the shared relief pool balance, escrow breakdown, and wallet connection](images/donate.png)
+
+## End-to-End Donation Flow
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Donor as Donor Browser + Wallet
+  participant Web as LifeLine Web App (Pre-flight & Outcome Parser)
+  participant FT as Pool Token (usdc.lifeline-demo.testnet)
+  participant Relief as Relief Contract (lifeline-demo.testnet)
+
+  Donor->>Web: Enter donation amount & click Donate
+  Web->>Relief: get_config() (verify pool_token matches)
+  Web->>FT: storage_balance_of(relief), ft_balance_of(donor)
+  Note over Web: Pre-flight passes: network, token,<br/>storage registration, and balance verified
+  Web->>Donor: Request signature for ft_transfer_call(receiver_id, amount, msg)
+  Donor->>FT: Sign & broadcast ft_transfer_call (1 yoctoNEAR, 150 TGas)
+  FT->>Relief: ft_on_transfer(sender_id, amount, msg)
+  alt Accepted in full
+    Relief-->>FT: Return U128(0) (0 refunded -> 100% kept)
+    Note over Relief: Credit pool_balance, record Donation,<br/>emit EVENT_JSON donation
+  else Receiver panics or rejects token
+    Relief-->>FT: Panic / return U128(amount)
+  end
+  FT->>FT: ft_resolve_transfer (settle used vs refunded amount)
+  FT-->>Web: Final transaction hash
+  Web->>FT: RPC tx(txHash, senderId) — inspect all receipt outcomes
+  Note over Web: Verify receiver, signer, ft_resolve_transfer return value,<br/>and any failed receipt on Relief contract
+  Web-->>Donor: Show exact accepted amount, any refund, and NearBlocks link
+```
+
 ## The transaction
 
 A donor's wallet signs one transaction to the pool token:

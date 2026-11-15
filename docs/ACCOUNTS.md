@@ -29,6 +29,40 @@
 
 ## Principle of Least Privilege
 
+```mermaid
+flowchart TB
+  subgraph Root["Root & Token Contracts"]
+    L["lifeline-demo.testnet<br/>Relief Pool & Escrow Contract"]
+    U["usdc.lifeline-demo.testnet<br/>NEP-141 Pool Token"]
+  end
+
+  subgraph Restricted["Method-Scoped FunctionCall Keys (0.25 NEAR gas allowance, 0 NEAR transfer capability)"]
+    IN["intake.lifeline-demo.testnet<br/>Allowed: submit_case, close_bidding"]
+    VG["v-geo.lifeline-demo.testnet<br/>Allowed: vote, vote_delivery"]
+    VF["v-fact.lifeline-demo.testnet<br/>Allowed: vote, vote_delivery"]
+    VS["v-sev.lifeline-demo.testnet<br/>Allowed: vote, vote_delivery"]
+    VR["v-red.lifeline-demo.testnet<br/>Allowed: vote, vote_delivery"]
+  end
+
+  subgraph Isolated["Isolated Sub-Accounts (FullAccess on own sub-account only)"]
+    CO["coord.lifeline-demo.testnet<br/>Role: human_confirm, human_reject"]
+    NR["ngo-rapid.lifeline-demo.testnet<br/>Role: register_ngo (bonded), place_bid, submit_proof"]
+    NB["ngo-balanced.lifeline-demo.testnet<br/>Role: register_ngo (bonded), place_bid, submit_proof"]
+    NF["ngo-frugal.lifeline-demo.testnet<br/>Role: register_ngo (bonded), place_bid, submit_proof"]
+  end
+
+  IN -- "FunctionCall key" --> L
+  VG -- "FunctionCall key" --> L
+  VF -- "FunctionCall key" --> L
+  VS -- "FunctionCall key" --> L
+  VR -- "FunctionCall key" --> L
+  CO -- "Calls coordinator methods" --> L
+  NR -- "Calls NGO methods" --> L
+  NB -- "Calls NGO methods" --> L
+  NF -- "Calls NGO methods" --> L
+  L -- "Cross-contract ft_transfer" --> U
+```
+
 1. **Verifier accounts (`v-geo`, `v-fact`, `v-sev`, `v-red`)** hold **FunctionCall-only** access keys pinned to `lifeline-demo.testnet` and restricted strictly to `vote` and `vote_delivery` with a `0.25 NEAR` gas allowance. Because NEAR FunctionCall access keys cannot attach NEAR deposits and cannot call any other method, a leaked verifier key **cannot** drain the pool, register NGOs, override config, or confirm split votes.
 2. **Intake oracle (`intake`)** holds a **FunctionCall-only** access key restricted strictly to `submit_case` and `close_bidding` with a `0.25 NEAR` gas allowance.
 3. **NGO accounts (`ngo-rapid`, `ngo-balanced`, `ngo-frugal`)** hold FullAccess keys on their own isolated sub-accounts so they can attach the required `1 NEAR` anti-spam registration bond when calling `register_ngo`.
